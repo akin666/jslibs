@@ -4,14 +4,20 @@
 define(
     [
         './system/instance',
-        './system/music'
+        './system/music',
+        './system/log',
+        './system/math',
     ] ,
     function (
         Instance,
-        Music
+        Music,
+        Log,
+        Math
     ) {
         return {
             Instance: Instance,
             Music: Music,
+            Log: Log,
+            Math: Math,
         }
     });
