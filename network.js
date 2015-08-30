@@ -38,7 +38,7 @@ Contains:
 // Uses jquery ajax
 // http://api.jquery.com/jquery.ajax/
 // We are assuming JSON almost every corner here.
-define('jslibs/network', ['jslibs/common',"jquery"] , function (common, $) {
+define(['common',"jquery"] , function (common, $) {
     var Network = {
         timeout: 10 * 1000
     };

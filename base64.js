@@ -1,4 +1,4 @@
-define('jslibs/base64' , function () {
+define(function () {
     var Base64 = {
         // private property
         _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",

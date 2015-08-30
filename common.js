@@ -2,7 +2,7 @@
 //// Leaky library, registers everything to window
 //// as I think these should've been js core in the first place.
 ////
-define('jslibs/common' , function () {
+define(function () {
     // define isset
     window.isset = function (object) {
         // anything that evaluates null is wrong!.
