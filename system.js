@@ -3,8 +3,8 @@
  */
 define(
     [
-        './system/instance',
-        './system/music',
+        './entity/instance',
+        './entity/music',
         './system/log',
         './system/math',
     ] ,
