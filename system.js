@@ -7,17 +7,20 @@ define(
         './entity/music',
         './system/log',
         './system/math',
+        './system/time',
     ] ,
     function (
         Instance,
         Music,
         Log,
-        Math
+        Math,
+        Time
     ) {
         return {
             Instance: Instance,
             Music: Music,
             Log: Log,
             Math: Math,
+            Time: Time,
         }
     });
