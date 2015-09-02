@@ -62,39 +62,51 @@ define(["./simulation", "system"], function (Simulation, System) {
             this.array = this.a;
         }
 
-        for( var y = 0 ; y < this.height ; ++y ) {
-            for( var x = 0 ; x < this.width ; ++x ) {
-                var neightbours =
-                    old.cell(x -1 , y - 1 ) +
-                    old.cell(x -1 , y ) +
-                    old.cell(x -1 , y + 1 ) +
-                    old.cell(x    , y - 1 ) +
-                    old.cell(x    , y + 1 ) +
-                    old.cell(x +1 , y - 1) +
-                    old.cell(x +1 , y ) +
-                    old.cell(x +1 , y + 1);
-                var self = old.cell(x, y);
+        var prev = old.raw();
+        var current = this.array.raw();
+
+        // simple square, no portal logics..
+        for( var y = 1 ; y < (this.height-1) ; ++y ) {
+
+            var ypos = y * this.width;
+            for( var x = 1 ; x < (this.width-1) ; ++x ) {
+                var neighbours =
+                    prev[ ypos - this.width + x - 1] +
+                    prev[ ypos              + x - 1] +
+                    prev[ ypos + this.width + x - 1] +
+                    prev[ ypos - this.width + x    ] +
+                    prev[ ypos + this.width + x    ] +
+                    prev[ ypos - this.width + x + 1] +
+                    prev[ ypos              + x + 1] +
+                    prev[ ypos + this.width + x + 1];
+                var self = prev[ ypos + x ];
 
                 var value = 0.0;
 
                 if( self === 1.0 ) {
                     // 1) any live cell with fewer than 2 neighbours dies.
                     // 3) any live cell with more than 3 neighbours dies
-                    if (neightbours < 2.0 || neightbours > 3.0) {
+                    if (neighbours < 2.0 || neighbours > 3.0) {
                         value = 0.0;
                     }
                     // 2) any live cell with 2 or 3 neighbours lives on
-                    else if (neightbours <= 3.0) {
+                    else if (neighbours <= 3.0) {
                         value = 1.0;
                     }
                 }
                 // 4) any dead cell with 3 neighbours becomes live cell
-                else if( neightbours === 3.0 ) {
+                else if( neighbours === 3.0 ) {
                     value = 1.0;
                 }
-
-                this.array.cell(x,y,value);
+                current[ypos + x] = value;
             }
+        }
+
+        for( var x = 0 ; x < this.width ; ++x ) {
+            // top bottom
+        }
+        for( var y = 1 ; y < (this.height-1) ; ++y ) {
+            // left right
         }
     }
 
@@ -116,12 +128,13 @@ define(["./simulation", "system"], function (Simulation, System) {
 
         var tx,ty;
 
+        var current = this.array.raw();
         for( var y = 0 ; y < this.height ; ++y ) {
             ty = y * this.cellSize;
             for( var x = 0 ; x < this.width ; ++x ) {
                 tx = x * this.cellSize;
 
-                ctx.fillStyle = this.array.cell(x,y) == 0 ? dark : white;
+                ctx.fillStyle = current[y * this.width + x] == 0 ? dark : white;
 
                 ctx.fillRect(
                     tx,
