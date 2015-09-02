@@ -7,7 +7,7 @@ define(["./simulation", "system"], function (Simulation, System) {
 
         this.width = parseInt(this.element.attr("data-width"));
         this.height = parseInt(this.element.attr("data-height"));
-        this.cellSize = 4.1;
+        this.cellSize = 3.0;
 
         this.remaining = 0.0;
         this.spending = 100;
@@ -99,7 +99,7 @@ define(["./simulation", "system"], function (Simulation, System) {
     }
 
     Application.prototype.logicUpdate = function(config){
-        this.remaining += config.delta;
+        this.remaining += config.deltams;
 
         for( ; this.remaining > this.spending ; this.remaining -= this.spending ) {
             this.simulate();

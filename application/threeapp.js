@@ -3,11 +3,11 @@
  */
 define(["three", "./simulation"], function (THREE, Simulation) {
     function Application(config){
-        this.element = config.element;
+        Simulation.call( this , config );
 
         // ThreeJS test app
-        this.width = this.element[0].innerWidth;
-        this.height = this.element[0].innerHeight;
+        this.width = this.element.width();
+        this.height = this.element.height();
         this.aspect = this.width / this.height;
         this.fov = 75;
         this.near = 0.1;
@@ -15,11 +15,11 @@ define(["three", "./simulation"], function (THREE, Simulation) {
 
         var geometry = new THREE.BoxGeometry( 1, 1, 1 );
         var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-        var cube = new THREE.Mesh( geometry, material );
+        this.cube = new THREE.Mesh( geometry, material );
 
         this.scene = new THREE.Scene();
 
-        this.scene.add( cube );
+        this.scene.add( this.cube );
 
         this.camera = new THREE.PerspectiveCamera(
             this.fov,
@@ -32,15 +32,24 @@ define(["three", "./simulation"], function (THREE, Simulation) {
         this.renderer.setSize( this.width, this.height );
         this.element.append( this.renderer.domElement );
 
-        camera.position.z = 5;
+        this.camera.position.z = 5;
+
+        // start simulation right away...
+        this.update();
+
         return this;
     }
 
+    // specify inheritance
+    Application.prototype = Object.create( Simulation.prototype );
+
     Application.prototype.logicUpdate = function(config){
+        this.cube.rotation.x += 1.0 * config.delta;
+        this.cube.rotation.y += 1.0 * config.delta;
     }
 
     Application.prototype.drawUpdate = function(config){
-        this.renderer.render( scene, camera );
+        this.renderer.render( this.scene, this.camera );
     }
 
     return Application;

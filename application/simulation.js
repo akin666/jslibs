@@ -29,7 +29,8 @@ define(["system"], function (System) {
         }
 
         this.logicUpdate({
-            delta: delta
+            delta: delta * 0.001,
+            deltams: delta
         });
         this.drawUpdate({
         });
