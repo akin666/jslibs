@@ -1,7 +1,7 @@
 /**
  * Created by akin on 02/09/15.
  */
-define(["system"], function (System) {
+define(["three", "./simulation"], function (THREE, Simulation) {
     function Application(config){
         this.element = config.element;
 
@@ -28,42 +28,19 @@ define(["system"], function (System) {
             this.far
         );
 
-        camera.position.z = 5;
-        return this;
-    }
-
-    Application.prototype.initRenderer = function() {
-
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize( this.width, this.height );
         this.element.append( this.renderer.domElement );
+
+        camera.position.z = 5;
+        return this;
     }
 
     Application.prototype.logicUpdate = function(config){
     }
 
     Application.prototype.drawUpdate = function(config){
-    }
-
-    Application.prototype.update = function() {
-        this.updateID = requestAnimationFrame( this.update.bind(this) );
-        this.time.apply();
-
-        var delta = this.time.getDelta();
-        if( delta > this.maxSimulationTime ) {
-            delta = 0.0;
-        }
-
-        this.logicUpdate({
-            delta: delta
-        });
-        this.drawUpdate({
-        });
-    }
-
-    Application.prototype.exit = function() {
-        cancelAnimationFrame(this.updateID);
-        this.updateID = null;
+        this.renderer.render( scene, camera );
     }
 
     return Application;

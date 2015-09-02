@@ -8,13 +8,15 @@ define(
         './system/log',
         './system/math',
         './system/time',
+        './system/array2d',
     ] ,
     function (
         Instance,
         Music,
         Log,
         Math,
-        Time
+        Time,
+        Array2D
     ) {
         return {
             Instance: Instance,
@@ -22,5 +24,6 @@ define(
             Log: Log,
             Math: Math,
             Time: Time,
+            Array2D: Array2D,
         }
     });
