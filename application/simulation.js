@@ -19,12 +19,20 @@ define(["system"], function (System) {
     Application.prototype.drawUpdate = function(config){
     }
 
+    Application.prototype.skippedUpdate = function(config){
+        console.log("Skipped " + config.delta + " seconds.")
+    }
+
     Application.prototype.update = function() {
         this.updateID = requestAnimationFrame( this.update.bind(this) );
         this.time.apply();
 
         var delta = this.time.getDelta();
         if( delta > this.maxSimulationTime ) {
+            this.skippedUpdate({
+                delta: delta * 0.001,
+                ms: delta
+            });
             delta = 0.0;
         }
 
