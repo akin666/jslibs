@@ -51,6 +51,40 @@ define(["./simulation", "system"], function (Simulation, System) {
         for( var i = 0 ; i < raw.length ; ++i ) {
             raw[i] = (Math.random() > 0.66 ? 1.0 : 0.0 );
         }
+        // Hack, im too lazy to do the 4 special corners..
+        var max = this.height * this.width;
+        raw[0] = 0;
+        raw[this.width -1] = 0;
+        raw[max - this.width] = 0;
+        raw[max - 1] = 0;
+    }
+
+    var simuFunction = function(self , neighbours) {
+        if( self === 1.0 ) {
+            // 1) any live cell with fewer than 2 neighbours dies.
+            // 3) any live cell with more than 3 neighbours dies
+            if (neighbours >= 2.0 && neighbours <= 3.0) {
+                return 1.0;
+            }
+        }
+        // 4) any dead cell with 3 neighbours becomes live cell
+        else {
+            if( neighbours === 3.0 ) {
+                return 1.0;
+            }
+        }
+        return 0.0;
+    }
+
+    var calculateNeighbours = function(arr, top, center, bottom , x) {
+        return  arr[ top    + x - 1] +
+                arr[ center + x - 1] +
+                arr[ bottom + x - 1] +
+                arr[ top    + x    ] +
+                arr[ bottom + x    ] +
+                arr[ top    + x + 1] +
+                arr[ center + x + 1] +
+                arr[ bottom + x + 1];
     }
 
     Application.prototype.simulate = function() {
@@ -67,47 +101,62 @@ define(["./simulation", "system"], function (Simulation, System) {
 
         // simple square, no portal logics..
         for( var y = 1 ; y < (this.height-1) ; ++y ) {
-
-            var ypos = y * this.width;
+            var top = (y-1) * this.width;
+            var center = y * this.width;
+            var bottom = (y+1) * this.width;
             for( var x = 1 ; x < (this.width-1) ; ++x ) {
-                var neighbours =
-                    prev[ ypos - this.width + x - 1] +
-                    prev[ ypos              + x - 1] +
-                    prev[ ypos + this.width + x - 1] +
-                    prev[ ypos - this.width + x    ] +
-                    prev[ ypos + this.width + x    ] +
-                    prev[ ypos - this.width + x + 1] +
-                    prev[ ypos              + x + 1] +
-                    prev[ ypos + this.width + x + 1];
-                var self = prev[ ypos + x ];
+                var neighbours = calculateNeighbours(prev , top , center , bottom , x);
 
-                var value = 0.0;
-
-                if( self === 1.0 ) {
-                    // 1) any live cell with fewer than 2 neighbours dies.
-                    // 3) any live cell with more than 3 neighbours dies
-                    if (neighbours < 2.0 || neighbours > 3.0) {
-                        value = 0.0;
-                    }
-                    // 2) any live cell with 2 or 3 neighbours lives on
-                    else if (neighbours <= 3.0) {
-                        value = 1.0;
-                    }
-                }
-                // 4) any dead cell with 3 neighbours becomes live cell
-                else if( neighbours === 3.0 ) {
-                    value = 1.0;
-                }
-                current[ypos + x] = value;
+                current[ center + x ] = simuFunction(prev[ center + x ], neighbours);
             }
         }
 
-        for( var x = 0 ; x < this.width ; ++x ) {
+        var first = 0;
+        var second = this.width;
+        var last = (this.height - 1) * this.width;
+        var secondlast = (this.height - 2) * this.width;
+        for( var x = 1 ; x < (this.width-1) ; ++x ) {
             // top bottom
+            var topNeighbours = calculateNeighbours(prev , last , first , second , x);
+            var bottomNeighbours = calculateNeighbours(prev , secondlast , last , first , x);
+
+            current[ first + x ] = simuFunction(prev[ first + x ], topNeighbours);
+            current[ last + x ] = simuFunction(prev[ last + x ], bottomNeighbours);
         }
+
+        var left = 0;
+        var right = 0;
         for( var y = 1 ; y < (this.height-1) ; ++y ) {
             // left right
+            left = y * this.width;
+            right = left + (this.width - 1);
+
+
+            // AB...C
+            // DE...F
+            // GH...I
+            // ......
+            //
+            // A+B+C + E+F + G+H+I
+            var leftNeighbours = prev[ left - this.width ] + prev[ left - this.width + 1 ] + prev[ left - 1 ] +
+                    prev[ left + 1 ] + prev[ left + this.width - 1 ] +
+                    prev[ left + this.width ] + prev[ left + this.width + 1 ] + prev[ left + this.width + this.width - 1];
+
+            // C...BA
+            // F...ED
+            // I...HG
+            // ......
+            //
+            // A+B+C + E+F + G+H+I
+            var rightNeighbours = prev[ right - this.width ] + prev[ right - this.width - 1 ] + prev[ right - this.width - this.width + 1 ] +
+                prev[ right - 1 ] + prev[ right - this.width + 1 ] +
+                prev[ right + this.width ] + prev[ right + this.width - 1 ] + prev[ right + 1];
+
+            current[ left ] = simuFunction(prev[ left ], leftNeighbours);
+            current[ right ] = simuFunction(prev[ right ], rightNeighbours);
         }
+
+        // 4 corners special..
     }
 
     Application.prototype.logicUpdate = function(config){
