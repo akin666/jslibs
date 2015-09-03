@@ -167,7 +167,7 @@ define(["./simulation", "system"], function (Simulation, System) {
     }
 
     Application.prototype.logicUpdate = function(config){
-        this.remaining += config.deltams;
+        this.remaining += config.ms;
 
         for( ; this.remaining > this.spending ; this.remaining -= this.spending ) {
             this.simulate();
