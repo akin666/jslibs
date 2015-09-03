@@ -12,6 +12,9 @@ define(["./simulation", "system"], function (Simulation, System) {
         this.remaining = 0.0;
         this.spending = 100;
 
+        this.off = "#223344";
+        this.on= "#AAAAFF";
+
         // 2) any live cell with 2 or 3 neighbours lives on
         // 3) any live cell with more than 3 neighbours dies
         // 4) any dead cell with 3 neighbours becomes live cell
@@ -47,16 +50,20 @@ define(["./simulation", "system"], function (Simulation, System) {
     Application.prototype = Object.create( Simulation.prototype );
 
     Application.prototype.randomize = function() {
-        var raw = this.array.raw();
-        for( var i = 0 ; i < raw.length ; ++i ) {
-            raw[i] = (Math.random() > 0.66 ? 1.0 : 0.0 );
+        var araw = this.a.raw();
+        var braw = this.b.raw();
+        for( var i = 0 ; i < araw.length ; ++i ) {
+            var tt = Math.random() > 0.66;
+
+            araw[i] = (tt ? 1.0 : 0.0 );
+            braw[i] = (tt ? 0.0 : 1.0 );
         }
         // Hack, im too lazy to do the 4 special corners..
         var max = this.height * this.width;
-        raw[0] = 0;
-        raw[this.width -1] = 0;
-        raw[max - this.width] = 0;
-        raw[max - 1] = 0;
+        araw[0] = braw[0];
+        araw[this.width -1] = braw[this.width -1];
+        araw[max - this.width] = braw[max - this.width];
+        araw[max - 1] = braw[max - 1];
     }
 
     var simuFunction = function(self , neighbours) {
@@ -167,15 +174,31 @@ define(["./simulation", "system"], function (Simulation, System) {
         }
     }
 
+    Application.prototype.clearCanvas = function() {
+        var canvas = this.canvas[0];
+        var ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = current[y * this.width + x] == 0 ? this.off : this.on;
+
+        ctx.fillRect(
+            tx,
+            ty,
+            this.cellSize  ,
+            this.cellSize );
+    }
+
+
     Application.prototype.drawUpdate = function(config){
         var canvas = this.canvas[0];
 
         var ctx = canvas.getContext("2d");
 
-        var dark = "#223344";
-        var white= "#AAAAFF";
-
         var tx,ty;
+
+        var old = this.a.raw();
+        if( this.array === this.a ) {
+            old = this.b.raw();
+        }
 
         var current = this.array.raw();
         for( var y = 0 ; y < this.height ; ++y ) {
@@ -183,7 +206,18 @@ define(["./simulation", "system"], function (Simulation, System) {
             for( var x = 0 ; x < this.width ; ++x ) {
                 tx = x * this.cellSize;
 
-                ctx.fillStyle = current[y * this.width + x] == 0 ? dark : white;
+                var pos = y * this.width + x;
+
+                var val1 = current[pos];
+                var val2 = old[pos];
+
+                // optimization.. draw only change.
+                // no change?
+                if( val1 === val2 ) {
+                    continue;
+                }
+
+                ctx.fillStyle = current[y * this.width + x] == 0 ? this.off : this.on;
 
                 ctx.fillRect(
                     tx,
