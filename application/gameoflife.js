@@ -15,6 +15,7 @@ define(["./simulation", "system"], function (Simulation, System) {
         this.off = "#223344";
         this.on= "#AAAAFF";
 
+        // 1) any live cell with fewer than 2 neighbours dies.
         // 2) any live cell with 2 or 3 neighbours lives on
         // 3) any live cell with more than 3 neighbours dies
         // 4) any dead cell with 3 neighbours becomes live cell
