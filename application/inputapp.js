@@ -1,7 +1,7 @@
 /**
  * Created by akin on 02/09/15.
  */
-define(["./simulation"], function (Simulation) {
+define(["./simulation","jquery","jquery-mobile"], function (Simulation) {
     function Application(config){
         Simulation.call( this , config );
 
@@ -12,6 +12,7 @@ define(["./simulation"], function (Simulation) {
 
         this.background = "#AADDFF";
         this.color= "#6699FF";
+        this.err= "#FF9966";
 
         var canvas = this.canvas[0];
         canvas.width  = this.width;
@@ -20,7 +21,27 @@ define(["./simulation"], function (Simulation) {
         this.element.append(this.canvas);
         this.clearCanvas();
 
-        this.canvas.on("tap", this.onTap.bind(this) );
+        var that = this;
+        this.canvas.on("tap", function(event) {
+                if( that != null ) {
+                    that.onTap({
+                        hold: false,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            }
+        );
+        this.canvas.on("taphold", function(event) {
+                if( that != null ) {
+                    that.onTap({
+                        hold: true,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            }
+        );
 
         return this;
     }
@@ -31,13 +52,23 @@ define(["./simulation"], function (Simulation) {
     Application.prototype.onTap = function(config) {
         var canvas = this.canvas[0];
         var ctx = canvas.getContext("2d");
-        ctx.fillStyle = this.color;
 
-        ctx.fillRect(
-            10,
-            10,
-            5  ,
-            5 );
+        if( config.hold ) {
+            ctx.fillStyle = this.err;
+            ctx.fillRect(
+                config.x - 5,
+                config.y - 5,
+                10  ,
+                10 );
+        }
+        else {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(
+                config.x - 3,
+                config.y - 3,
+                6  ,
+                6 );
+        }
     }
 
     Application.prototype.clearCanvas = function() {
