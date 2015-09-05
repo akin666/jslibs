@@ -1,7 +1,7 @@
 /**
  * Created by akin on 02/09/15.
  */
-define(["./simulation","jquery","jquery-mobile"], function (Simulation) {
+define(["./simulation","input"], function (Simulation, Input) {
     function Application(config){
         Simulation.call( this , config );
 
@@ -11,8 +11,11 @@ define(["./simulation","jquery","jquery-mobile"], function (Simulation) {
         this.canvas = $('<canvas/>');
 
         this.background = "#AADDFF";
-        this.color= "#6699FF";
-        this.err= "#FF9966";
+
+        this.tapColor= "#6699FF";
+        this.tapHoldColor= "#FF9966";
+        this.touchColor= "#66FF66";
+
 
         var canvas = this.canvas[0];
         canvas.width  = this.width;
@@ -21,27 +24,10 @@ define(["./simulation","jquery","jquery-mobile"], function (Simulation) {
         this.element.append(this.canvas);
         this.clearCanvas();
 
-        var that = this;
-        this.canvas.on("tap", function(event) {
-                if( that != null ) {
-                    that.onTap({
-                        hold: false,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            }
-        );
-        this.canvas.on("taphold", function(event) {
-                if( that != null ) {
-                    that.onTap({
-                        hold: true,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            }
-        );
+        this.touchInput = new Input.Touch({
+            element: this.canvas,
+            target: this
+        });
 
         return this;
     }
@@ -54,7 +40,7 @@ define(["./simulation","jquery","jquery-mobile"], function (Simulation) {
         var ctx = canvas.getContext("2d");
 
         if( config.hold ) {
-            ctx.fillStyle = this.err;
+            ctx.fillStyle = this.tapHoldColor;
             ctx.fillRect(
                 config.x - 5,
                 config.y - 5,
@@ -62,13 +48,31 @@ define(["./simulation","jquery","jquery-mobile"], function (Simulation) {
                 10 );
         }
         else {
-            ctx.fillStyle = this.color;
+            ctx.fillStyle = this.tapColor;
             ctx.fillRect(
                 config.x - 3,
                 config.y - 3,
                 6  ,
                 6 );
         }
+    }
+
+    Application.prototype.onSwipe = function(config) {
+    }
+
+    Application.prototype.onScroll = function(config) {
+    }
+
+    Application.prototype.onTouch = function(config) {
+        var canvas = this.canvas[0];
+        var ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = this.touchColor;
+        ctx.fillRect(
+            config.x - 3,
+            config.y - 3,
+            6  ,
+            6 );
     }
 
     Application.prototype.clearCanvas = function() {
