@@ -108,6 +108,7 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("mousedown", function (event) {
                     target.onMouse({
                         type: "down",
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -116,6 +117,7 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("mouseup", function (event) {
                     target.onMouse({
                         type: "up",
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
