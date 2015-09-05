@@ -30,24 +30,6 @@ define(["jquery","jquery-mobile"], function ($) {
             return;
         }
 
-        if( target.onTap != null  ) {
-            element.on("tap", function (event) {
-                    target.onTap({
-                        hold: false,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            element.on("taphold", function (event) {
-                    target.onTap({
-                        hold: true,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-        }
         if( target.onTouch != null  ) {
             element.on("touchstart", function (event) {
                     target.onTouch({
@@ -68,6 +50,24 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("touchmove", function (event) {
                     target.onTouch({
                         state: "move",
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+        }
+        if( target.onTap != null  ) {
+            element.on("tap", function (event) {
+                    target.onTap({
+                        hold: false,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+            element.on("taphold", function (event) {
+                    target.onTap({
+                        hold: true,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
