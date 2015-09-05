@@ -32,6 +32,7 @@ define(["jquery","jquery-mobile"], function ($) {
 
         if( target.onTouch != null  ) {
             element.on("touchstart", function (event) {
+                    //event.stopPropagation();
                     target.onTouch({
                         state: "start",
                         x: event.offsetX,

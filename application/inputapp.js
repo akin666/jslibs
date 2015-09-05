@@ -16,6 +16,12 @@ define(["./simulation","input"], function (Simulation, Input) {
         this.tapHoldColor= "#FF9966";
         this.touchColor= "#66FF66";
 
+        this.mouseColor = [
+            "#00AA99",
+            "#00CCBB",
+            "#00EEDD",
+            "#00FFFF",
+        ];
 
         var canvas = this.canvas[0];
         canvas.width  = this.width;
@@ -29,6 +35,11 @@ define(["./simulation","input"], function (Simulation, Input) {
             target: this
         });
 
+        this.mouseInput = new Input.Mouse({
+            element: this.canvas,
+            target: this
+        });
+
         return this;
     }
 
@@ -36,25 +47,6 @@ define(["./simulation","input"], function (Simulation, Input) {
     Application.prototype = Object.create( Simulation.prototype );
 
     Application.prototype.onTap = function(config) {
-        var canvas = this.canvas[0];
-        var ctx = canvas.getContext("2d");
-
-        if( config.hold ) {
-            ctx.fillStyle = this.tapHoldColor;
-            ctx.fillRect(
-                config.x - 5,
-                config.y - 5,
-                10  ,
-                10 );
-        }
-        else {
-            ctx.fillStyle = this.tapColor;
-            ctx.fillRect(
-                config.x - 3,
-                config.y - 3,
-                6  ,
-                6 );
-        }
     }
 
     Application.prototype.onSwipe = function(config) {
@@ -64,15 +56,20 @@ define(["./simulation","input"], function (Simulation, Input) {
     }
 
     Application.prototype.onTouch = function(config) {
+    }
+
+    Application.prototype.onMouse = function(config) {
         var canvas = this.canvas[0];
         var ctx = canvas.getContext("2d");
 
-        ctx.fillStyle = this.touchColor;
-        ctx.fillRect(
-            config.x - 3,
-            config.y - 3,
-            6  ,
-            6 );
+        if (config.button > 0 ) {
+            ctx.fillStyle = this.mouseColor[config.button];
+            ctx.fillRect(
+                config.x - 1,
+                config.y - 1,
+                2,
+                2);
+        }
     }
 
     Application.prototype.clearCanvas = function() {

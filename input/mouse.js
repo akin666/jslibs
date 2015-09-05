@@ -33,7 +33,7 @@ define(["jquery","jquery-mobile"], function ($) {
         if( target.onClick != null  ) {
             element.on("click", function (event) {
                     target.onClick({
-                        count: 1,
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -41,7 +41,7 @@ define(["jquery","jquery-mobile"], function ($) {
             );
             element.on("dblclick", function (event) {
                     target.onClick({
-                        count: 2,
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -49,6 +49,7 @@ define(["jquery","jquery-mobile"], function ($) {
             );
         }
         if( target.onMouse != null  ) {
+            /*
             element.on("hover", function (event) {
                     target.onMouse({
                         type: "move",
@@ -58,10 +59,11 @@ define(["jquery","jquery-mobile"], function ($) {
                     });
                 }
             );
+            */
             element.on("mousemove", function (event) {
                     target.onMouse({
                         type: "move",
-                        down: true,
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -70,6 +72,7 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("mouseout", function (event) {
                     target.onMouse({
                         type: "out",
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -78,6 +81,7 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("mouseleave", function (event) {
                     target.onMouse({
                         type: "leave",
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -86,6 +90,7 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("mouseenter", function (event) {
                     target.onMouse({
                         type: "enter",
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
@@ -94,6 +99,7 @@ define(["jquery","jquery-mobile"], function ($) {
             element.on("mouseover", function (event) {
                     target.onMouse({
                         type: "over",
+                        button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
