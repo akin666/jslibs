@@ -30,84 +30,38 @@ define(["jquery","jquery-mobile"], function ($) {
             return;
         }
 
-        if( target.onClick != null  ) {
+        if( target.pointerClick != null  ) {
             element.on("click", function (event) {
-                    target.onClick({
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    target.pointerClick({
                         button: event.which,
+                        hold: false,
+                        double: false,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
             element.on("dblclick", function (event) {
-                    target.onClick({
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    target.pointerClick({
                         button: event.which,
+                        hold: false,
+                        double: true,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
         }
-        if( target.onMouse != null  ) {
-            /*
-            element.on("hover", function (event) {
-                    target.onMouse({
-                        type: "move",
-                        down: false,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            */
-            element.on("mousemove", function (event) {
-                    target.onMouse({
-                        type: "move",
-                        button: event.which,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            element.on("mouseout", function (event) {
-                    target.onMouse({
-                        type: "out",
-                        button: event.which,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            element.on("mouseleave", function (event) {
-                    target.onMouse({
-                        type: "leave",
-                        button: event.which,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            element.on("mouseenter", function (event) {
-                    target.onMouse({
-                        type: "enter",
-                        button: event.which,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            element.on("mouseover", function (event) {
-                    target.onMouse({
-                        type: "over",
-                        button: event.which,
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
+        if( target.pointerButton != null  ) {
             element.on("mousedown", function (event) {
-                    target.onMouse({
-                        type: "down",
+                    target.pointerButton({
+                        down: 1.0,
                         button: event.which,
                         x: event.offsetX,
                         y: event.offsetY,
@@ -115,9 +69,68 @@ define(["jquery","jquery-mobile"], function ($) {
                 }
             );
             element.on("mouseup", function (event) {
-                    target.onMouse({
-                        type: "up",
+                    target.pointerButton({
+                        down: 0.0,
                         button: event.which,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+        }
+        if( target.pointerAction != null ) {
+            element.on("mouseout", function (event) {
+                    target.pointerAction({
+                        type: "cancel",
+                        id: 1,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+            element.on("mouseleave", function (event) {
+                    target.pointerAction({
+                        type: "cancel",
+                        id: 1,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+            element.on("mouseenter", function (event) {
+                    target.pointerAction({
+                        type: "continue",
+                        id: 1,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+        }
+        if( target.pointerMove != null  ) {
+            element.on("hover", function (event) {
+                    var buttons = [];
+                    if( event.which != 0 ) {
+                        buttons.push( event.which );
+                    }
+                    target.pointerHover({
+                        type: "hover",
+                        id: 1,
+                        button: buttons,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+            element.on("mousemove", function (event) {
+                    var buttons = [];
+                    if( event.which != 0 ) {
+                        buttons.push( event.which );
+                    }
+                    target.pointerMove({
+                        type: "move",
+                        id: 1,
+                        button: buttons,
                         x: event.offsetX,
                         y: event.offsetY,
                     });

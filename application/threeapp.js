@@ -76,43 +76,70 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
 
-    Application.prototype.onMouse = function(config) {
+    Application.prototype.pointerButton = function(config) {
         var button = config.button;
-        if( button <= 0 ) {
+        if( button == 0 ) {
             return;
         }
-        var data = this.mousePosition[button];
-        switch(config.type)
-        {
-            case "down" : {
-                data.origo.x = config.x;
-                data.origo.y = config.y;
-                data.delta.x = 0;
-                data.delta.y = 0;
-                break;
-            }
-            case "move" : {
-                data.delta.x = config.x - data.origo.x;
-                data.delta.y = config.y - data.origo.y;
 
-                break;
-            }
-            case "leave" :
-            case "up" : {
+        var data = this.mousePosition[button];
+        if( config.down ) {
+            data.origo.x = config.x;
+            data.origo.y = config.y;
+            data.delta.x = 0;
+            data.delta.y = 0;
+        }
+        else {
+            // "commit"
+            data.value.x += data.delta.x;
+            data.value.y += data.delta.y;
+            data.delta.x = 0;
+            data.delta.y = 0;
+        }
+    }
+
+    Application.prototype.pointerAction = function(config) {
+        if (config.type == "end") {
+            for (var i = 0; i < this.mousePosition.length; ++i) {
                 // "commit"
+                var data = this.mousePosition[i];
+
                 data.value.x += data.delta.x;
                 data.value.y += data.delta.y;
                 data.delta.x = 0;
                 data.delta.y = 0;
-                break;
             }
-            default:
-                break;
         }
-        if(config.type=="down") {
-            data.origo.x = config.x;
-            data.origo.y = config.y;
-            return;
+        else if (config.type == "cancel") {
+            for (var i = 0; i < this.mousePosition.length; ++i) {
+                // "commit"
+                var data = this.mousePosition[i];
+
+                data.delta.x = 0;
+                data.delta.y = 0;
+            }
+        }
+        else if( config.type == "continue" ) {
+            for (var i = 0; i < this.mousePosition.length; ++i) {
+                // "commit"
+                var data = this.mousePosition[i];
+
+                data.origo.x = config.x;
+                data.origo.y = config.y;
+                data.delta.x = 0;
+                data.delta.y = 0;
+            }
+        }
+    }
+
+    Application.prototype.pointerMove = function(config) {
+        if (config.button == null || config.button.length > 0) {
+            var data = this.mousePosition[config.button[0]];
+            if (config.type == "move" )
+            {
+                data.delta.x = config.x - data.origo.x;
+                data.delta.y = config.y - data.origo.y;
+            }
         }
     }
 

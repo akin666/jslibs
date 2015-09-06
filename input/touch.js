@@ -30,54 +30,71 @@ define(["jquery","jquery-mobile"], function ($) {
             return;
         }
 
-        if( target.onTouch != null  ) {
+        if( target.pointerAction != null  ) {
             element.on("touchstart", function (event) {
                     //event.stopPropagation();
-                    target.onTouch({
-                        state: "start",
+                    target.pointerAction({
+                        type: "start",
+                        id: 1,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
+
             element.on("touchend", function (event) {
-                    target.onTouch({
-                        state: "end",
-                        x: event.offsetX,
-                        y: event.offsetY,
-                    });
-                }
-            );
-            element.on("touchmove", function (event) {
-                    target.onTouch({
-                        state: "move",
+                    target.pointerAction({
+                        type: "end",
+                        id: 1,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
         }
-        if( target.onTap != null  ) {
+        if( target.pointerMove != null  ) {
+            element.on("touchmove", function (event) {
+                    target.pointerMove({
+                        type: "move",
+                        id: 1,
+                        button: null,
+                        x: event.offsetX,
+                        y: event.offsetY,
+                    });
+                }
+            );
+        }
+        if( target.pointerClick != null  ) {
             element.on("tap", function (event) {
-                    target.onTap({
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    target.pointerClick({
+                        button: null,
                         hold: false,
+                        double: false,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
             element.on("taphold", function (event) {
-                    target.onTap({
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    target.pointerClick({
+                        button: null,
                         hold: true,
+                        double: false,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
         }
-        if( target.onSwipe != null  ) {
+        if( target.pointerSwipe != null  ) {
             element.on("swipe", function (event) {
-                    target.onSwipe({
+                    target.pointerSwipe({
                         direction: null,
                         x: event.offsetX,
                         y: event.offsetY,
@@ -85,34 +102,34 @@ define(["jquery","jquery-mobile"], function ($) {
                 }
             );
             element.on("swipeleft", function (event) {
-                    target.onSwipe({
-                        direction: "left",
+                    target.pointerSwipe({
+                        direction: -1.0,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
             element.on("swiperight", function (event) {
-                    target.onSwipe({
-                        direction: "right",
+                    target.pointerSwipe({
+                        direction: 1.0,
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
         }
-        if( target.onScroll != null  ) {
+        if( target.pointerScroll != null  ) {
             element.on("scrollstart", function(event) {
-                    target.onScroll({
-                        state: "start",
+                    target.pointerScroll({
+                        type: "start",
                         x: event.offsetX,
                         y: event.offsetY,
                     });
                 }
             );
             element.on("scrollstop", function (event) {
-                    target.onScroll({
-                        state: "end",
+                    target.pointerScroll({
+                        type: "end",
                         x: event.offsetX,
                         y: event.offsetY,
                     });

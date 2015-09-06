@@ -46,24 +46,12 @@ define(["./simulation","input"], function (Simulation, Input) {
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
 
-    Application.prototype.onTap = function(config) {
-    }
-
-    Application.prototype.onSwipe = function(config) {
-    }
-
-    Application.prototype.onScroll = function(config) {
-    }
-
-    Application.prototype.onTouch = function(config) {
-    }
-
-    Application.prototype.onMouse = function(config) {
+    Application.prototype.pointerMove = function(config) {
         var canvas = this.canvas[0];
         var ctx = canvas.getContext("2d");
 
-        if (config.button > 0 ) {
-            ctx.fillStyle = this.mouseColor[config.button];
+        if (config.button == null || config.button.length > 0 ) {
+            ctx.fillStyle = this.mouseColor[config.button[0]];
             ctx.fillRect(
                 config.x - 1,
                 config.y - 1,

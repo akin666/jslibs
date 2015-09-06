@@ -22,25 +22,23 @@ define(["jquery","jquery-mobile"], function ($) {
             element.off("keypress");
             return;
         }
-        if( target.onKey != null  ) {
+        if( target.keyAction != null  ) {
             element.on("keydown", function (event) {
-                    target.onKey({
-                        press: false,
-                        down: true,
+                    target.keyAction({
+                        down: 1.0,
                     });
                 }
             );
             element.on("keyup", function (event) {
-                    target.onKey({
-                        press: false,
-                        down: false,
+                    target.keyAction({
+                        down: 0.0,
                     });
                 }
             );
+        }
+        if( target.keyPress != null  ) {
             element.on("keypress", function (event) {
                     target.onKey({
-                        press: true,
-                        down: false,
                     });
                 }
             );
