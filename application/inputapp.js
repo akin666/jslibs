@@ -34,8 +34,11 @@ define(["./simulation","input"], function (Simulation, Input) {
             element: this.canvas,
             target: this
         });
-
         this.mouseInput = new Input.Mouse({
+            element: this.canvas,
+            target: this
+        });
+        this.keyInput = new Input.Keyboard({
             element: this.canvas,
             target: this
         });
@@ -45,6 +48,10 @@ define(["./simulation","input"], function (Simulation, Input) {
 
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
+
+    Application.prototype.pointerClick = function(config) {
+        this.keyInput.bind();
+    }
 
     Application.prototype.pointerMove = function(config) {
         var canvas = this.canvas[0];
@@ -60,6 +67,18 @@ define(["./simulation","input"], function (Simulation, Input) {
         }
     }
 
+    Application.prototype.pointerAction = function(config) {
+        if (config.type == "end") {
+            this.keyInput.unbind();
+        }
+        else if (config.type == "cancel") {
+            this.keyInput.unbind();
+        }
+        else if( config.type == "continue" ) {
+            this.keyInput.bind();
+        }
+    }
+
     Application.prototype.clearCanvas = function() {
         var canvas = this.canvas[0];
         var ctx = canvas.getContext("2d");
@@ -70,6 +89,10 @@ define(["./simulation","input"], function (Simulation, Input) {
             0,
             this.width  ,
             this.height );
+    }
+
+    Application.prototype.keyPress = function(config) {
+        console.log("InputApp: key: " + config.key + " code: " + config.code);
     }
 
     Application.prototype.logicUpdate = function(config){

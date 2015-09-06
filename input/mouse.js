@@ -14,21 +14,53 @@ define(["jquery","jquery-mobile"], function ($) {
         this.element = config.element;
         this.target = config.target;
 
-        var element = this.element;
-        var target = this.target;
-        if( target == null ) {
-            element.off("click");
-            element.off("dblclick");
-            element.off("hover");
-            element.off("mousemove");
-            element.off("mouseout");
-            element.off("mouseleave");
-            element.off("mouseenter");
-            element.off("mouseover");
-            element.off("mousedown");
-            element.off("mouseup");
+        this.bind();
+    }
+
+    Input.prototype.bind = function() {
+        this.apply(this.element);
+    }
+
+    Input.prototype.unbind = function() {
+        if( this.bound == null ) {
             return;
         }
+        this.bound.off("click");
+        this.bound.off("dblclick");
+        this.bound.off("hover");
+        this.bound.off("mousemove");
+        this.bound.off("mouseout");
+        this.bound.off("mouseleave");
+        this.bound.off("mouseenter");
+        this.bound.off("mouseover");
+        this.bound.off("mousedown");
+        this.bound.off("mouseup");
+        this.bound = null;
+    }
+
+    Input.prototype.apply = function(element) {
+        var target = this.target;
+        this.unbind();
+
+        if( element == null ) {
+            return;
+        }
+
+        if (target == null) {
+            return;
+        }
+        this.bound = element;
+
+        element.off("click");
+        element.off("dblclick");
+        element.off("hover");
+        element.off("mousemove");
+        element.off("mouseout");
+        element.off("mouseleave");
+        element.off("mouseenter");
+        element.off("mouseover");
+        element.off("mousedown");
+        element.off("mouseup");
 
         if( target.pointerClick != null  ) {
             element.on("click", function (event) {

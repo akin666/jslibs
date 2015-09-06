@@ -14,21 +14,57 @@ define(["jquery","jquery-mobile"], function ($) {
         this.element = config.element;
         this.target = config.target;
 
-        var element = this.element;
-        var target = this.target;
-        if (target == null) {
-            element.off("tap");
-            element.off("taphold");
-            element.off("touchstart");
-            element.off("touchend");
-            element.off("touchmove");
-            element.off("swipe");
-            element.off("swipeleft");
-            element.off("swiperight");
-            element.off("scrollstart");
-            element.off("scrollstop");
+        this.bind();
+    }
+
+    Input.prototype.bind = function() {
+        this.apply(this.element);
+    }
+
+    Input.prototype.bind = function() {
+        this.apply(this.element);
+    }
+
+    Input.prototype.unbind = function() {
+        if( this.bound == null ) {
             return;
         }
+        this.bound.off("tap");
+        this.bound.off("taphold");
+        this.bound.off("touchstart");
+        this.bound.off("touchend");
+        this.bound.off("touchmove");
+        this.bound.off("swipe");
+        this.bound.off("swipeleft");
+        this.bound.off("swiperight");
+        this.bound.off("scrollstart");
+        this.bound.off("scrollstop");
+        this.bound = null;
+    }
+
+    Input.prototype.apply = function(element) {
+        var target = this.target;
+        this.unbind();
+
+        if( element == null ) {
+            return;
+        }
+
+        if (target == null) {
+            return;
+        }
+        this.bound = element;
+
+        element.off("tap");
+        element.off("taphold");
+        element.off("touchstart");
+        element.off("touchend");
+        element.off("touchmove");
+        element.off("swipe");
+        element.off("swipeleft");
+        element.off("swiperight");
+        element.off("scrollstart");
+        element.off("scrollstop");
 
         if( target.pointerAction != null  ) {
             element.on("touchstart", function (event) {

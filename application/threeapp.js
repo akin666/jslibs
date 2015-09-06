@@ -30,7 +30,6 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
             this.far
         );
 
-
         this.camera = new THREE.PerspectiveCamera(
             this.fov,
             this.aspect,
@@ -66,6 +65,14 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
             element: $(this.renderer.domElement),
             target: this
         });
+        this.touchInput = new Input.Touch({
+            element: $(this.renderer.domElement),
+            target: this
+        });
+        this.keyInput = new Input.Keyboard({
+            element: $(this.renderer.domElement),
+            target: this
+        });
 
         // start simulation right away...
         this.update();
@@ -75,6 +82,10 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
 
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
+
+    Application.prototype.pointerClick = function(config) {
+        this.keyInput.bind();
+    }
 
     Application.prototype.pointerButton = function(config) {
         var button = config.button;
@@ -109,6 +120,7 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
                 data.delta.x = 0;
                 data.delta.y = 0;
             }
+            this.keyInput.unbind();
         }
         else if (config.type == "cancel") {
             for (var i = 0; i < this.mousePosition.length; ++i) {
@@ -118,6 +130,7 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
                 data.delta.x = 0;
                 data.delta.y = 0;
             }
+            this.keyInput.unbind();
         }
         else if( config.type == "continue" ) {
             for (var i = 0; i < this.mousePosition.length; ++i) {
@@ -129,6 +142,7 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
                 data.delta.x = 0;
                 data.delta.y = 0;
             }
+            this.keyInput.bind();
         }
     }
 
@@ -141,6 +155,10 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
                 data.delta.y = config.y - data.origo.y;
             }
         }
+    }
+
+    Application.prototype.keyPress = function(config) {
+        console.log("ThreeApp: key: " + config.key + " code: " + config.code);
     }
 
     Application.prototype.logicUpdate = function(config){
