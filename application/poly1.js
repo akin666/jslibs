@@ -15,17 +15,25 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
 
         this.scene = new THREE.Scene();
 
-        var geometry = new THREE.BoxGeometry( 2, 2, 2 );
+        var geometry = new THREE.BoxGeometry( 200, 100, 50 );
         var material = new THREE.MeshBasicMaterial( {
             color: 0x0099BB,
             wireframe: true
         });
         this.cube = new THREE.Mesh( geometry, material );
+
+        this.cube.position.z = -100;
+
         this.scene.add( this.cube );
 
-        this.camera = new THREE.PerspectiveCamera(
-            this.fov,
-            this.aspect,
+        var halfW = this.width / 2.0;
+        var halfH = this.height / 2.0;
+
+        this.camera = new THREE.OrthographicCamera(
+            -halfH,
+             halfW,
+             halfH,
+            -halfH,
             this.near,
             this.far
         );
@@ -67,6 +75,12 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
             target: this
         });
 
+        this.addPoly({
+            x: -20,
+            y: -60,
+            material: material,
+        });
+
         // start simulation right away...
         this.update();
 
@@ -75,6 +89,25 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
 
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
+
+    Application.prototype.addPoly = function(config) {
+        var rectLength = 120, rectWidth = 40;
+
+        var shape = new THREE.Shape();
+        shape.moveTo( 0  ,0 );
+        shape.lineTo( 0, rectWidth );
+        shape.lineTo( rectLength, rectWidth );
+        shape.lineTo( rectLength, 0 );
+        shape.lineTo( 0, 0 );
+
+        var geom = new THREE.ShapeGeometry( shape );
+        var mesh = new THREE.Mesh( geom, config.material ) ;
+
+        mesh.position.x = config.x;
+        mesh.position.y = config.y;
+
+        this.scene.add( mesh );
+    }
 
     Application.prototype.pointerClick = function(config) {
         this.keyInput.bind();
