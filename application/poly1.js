@@ -1,7 +1,7 @@
 /**
  * Created by akin on 02/09/15.
  */
-define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
+define(["three", "system", "./simulation", "input"], function (THREE, System, Simulation, Input) {
     function Application(config){
         Simulation.call( this , config );
 
@@ -30,7 +30,7 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
         var halfH = this.height / 2.0;
 
         this.camera = new THREE.OrthographicCamera(
-            -halfH,
+            -halfW,
              halfW,
              halfH,
             -halfH,
@@ -60,7 +60,7 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
         this.renderer.setSize( this.width, this.height );
         this.element.append( this.renderer.domElement );
 
-        this.camera.position.z = 5;
+        this.camera.position.z = 1.0;
 
         this.mouseInput = new Input.Mouse({
             element: $(this.renderer.domElement),
@@ -75,11 +75,22 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
             target: this
         });
 
-        this.addPoly({
+        var un = 20;
+        this.poly = this.createPoly({
+            mesh: [
+                {x: -un, y: un, z:0 },
+                {x:  un, y: un, z:0 },
+                {x:  un, y:-un, z:0 },
+                {x: -un, y:-un, z:0 },
+            ],
             x: -20,
             y: -60,
-            material: material,
+            material: new THREE.LineBasicMaterial( {
+                color: 0xFF99BB,
+            }),
         });
+
+        this.scene.add( this.poly );
 
         // start simulation right away...
         this.update();
@@ -90,23 +101,50 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
 
-    Application.prototype.addPoly = function(config) {
-        var rectLength = 120, rectWidth = 40;
+    Application.prototype.createPoly = function(config) {
+        if( config.mesh == null || config.mesh.length < 1 ) {
+            return null;
+        }
 
-        var shape = new THREE.Shape();
-        shape.moveTo( 0  ,0 );
-        shape.lineTo( 0, rectWidth );
-        shape.lineTo( rectLength, rectWidth );
-        shape.lineTo( rectLength, 0 );
-        shape.lineTo( 0, 0 );
+        var geom = new THREE.Geometry();
 
-        var geom = new THREE.ShapeGeometry( shape );
-        var mesh = new THREE.Mesh( geom, config.material ) ;
+        var vertex = null;
+        for(var i = 0 ; i < config.mesh.length ; ++i)
+        {
+            vertex = config.mesh[i];
+            geom.vertices.push(new THREE.Vector3(vertex.x,vertex.y,vertex.z));
+        }
+        vertex = config.mesh[0];
+        geom.vertices.push(new THREE.Vector3(vertex.x,vertex.y,vertex.z));
+
+        var mesh = new THREE.Line( geom, config.material ) ;
 
         mesh.position.x = config.x;
         mesh.position.y = config.y;
 
-        this.scene.add( mesh );
+        return mesh;
+    }
+
+    Application.prototype.createLine = function(config) {
+        if( config.mesh == null || config.mesh.length < 1 ) {
+            return null;
+        }
+
+        var geom = new THREE.Geometry();
+
+        var vertex = null;
+        for(var i = 0 ; i < config.mesh.length ; ++i)
+        {
+            vertex = config.mesh[i];
+            geom.vertices.push(new THREE.Vector3(vertex.x,vertex.y,vertex.z));
+        }
+
+        var mesh = new THREE.Line( geom, config.material ) ;
+
+        mesh.position.x = config.x;
+        mesh.position.y = config.y;
+
+        return mesh;
     }
 
     Application.prototype.pointerClick = function(config) {
@@ -172,6 +210,14 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
         }
     }
 
+    Application.prototype.screenToScene = function(point)
+    {
+        return {
+            x: point.x - (this.width / 2.0),
+            y: -point.y + (this.height / 2.0)
+        };
+    }
+
     Application.prototype.pointerMove = function(config) {
         if (config.button == null || config.button.length > 0) {
             var data = this.mousePosition[config.button[0]];
@@ -180,6 +226,11 @@ define(["three", "./simulation", "input"], function (THREE, Simulation, Input) {
                 data.delta.x = config.x - data.origo.x;
                 data.delta.y = config.y - data.origo.y;
             }
+
+            var point = this.screenToScene(config);
+
+            this.poly.position.x = point.x;
+            this.poly.position.y = point.y;
         }
     }
 

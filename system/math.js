@@ -158,6 +158,9 @@ define(function () {
     }
     // The result depends on whether the Y axis points up or down.
     math.polygonWindingOrderCW = function( points , y_axis_up ) {
+        if( y_axis_up == null ) {
+            y_axis_up = true;
+        }
         var area = 0;
         var size = points.length;
         for( var i = 0 ; i < size ; ++i ) {
