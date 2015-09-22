@@ -1,7 +1,7 @@
 /**
  * Created by akin on 02/09/15.
  */
-define(["three", "system", "./simulation", "input"], function (THREE, System, Simulation, Input) {
+define(["three", "system", "scene", "./simulation", "input"], function (THREE, System, Scene, Simulation, Input) {
     function Application(config){
         Simulation.call( this , config );
 
@@ -76,21 +76,23 @@ define(["three", "system", "./simulation", "input"], function (THREE, System, Si
         });
 
         var un = 20;
-        this.poly = this.createPoly({
+        this.poly = new Scene.SceneObject({
+            scene: this.scene,
+            type: 'polygon',
             mesh: [
                 {x: -un, y: un, z:0 },
                 {x:  un, y: un, z:0 },
                 {x:  un, y:-un, z:0 },
                 {x: -un, y:-un, z:0 },
             ],
-            x: -20,
-            y: -60,
+            position: {
+                x: -20,
+                y: -60,
+            },
             material: new THREE.LineBasicMaterial( {
                 color: 0xFF99BB,
-            }),
+            })
         });
-
-        this.scene.add( this.poly );
 
         // start simulation right away...
         this.update();
@@ -101,54 +103,16 @@ define(["three", "system", "./simulation", "input"], function (THREE, System, Si
     // specify inheritance
     Application.prototype = Object.create( Simulation.prototype );
 
-    Application.prototype.createPoly = function(config) {
-        if( config.mesh == null || config.mesh.length < 1 ) {
-            return null;
-        }
-
-        var geom = new THREE.Geometry();
-
-        var vertex = null;
-        for(var i = 0 ; i < config.mesh.length ; ++i)
-        {
-            vertex = config.mesh[i];
-            geom.vertices.push(new THREE.Vector3(vertex.x,vertex.y,vertex.z));
-        }
-        vertex = config.mesh[0];
-        geom.vertices.push(new THREE.Vector3(vertex.x,vertex.y,vertex.z));
-
-        var mesh = new THREE.Line( geom, config.material ) ;
-
-        mesh.position.x = config.x;
-        mesh.position.y = config.y;
-
-        return mesh;
-    }
-
-    Application.prototype.createLine = function(config) {
-        if( config.mesh == null || config.mesh.length < 1 ) {
-            return null;
-        }
-
-        var geom = new THREE.Geometry();
-
-        var vertex = null;
-        for(var i = 0 ; i < config.mesh.length ; ++i)
-        {
-            vertex = config.mesh[i];
-            geom.vertices.push(new THREE.Vector3(vertex.x,vertex.y,vertex.z));
-        }
-
-        var mesh = new THREE.Line( geom, config.material ) ;
-
-        mesh.position.x = config.x;
-        mesh.position.y = config.y;
-
-        return mesh;
-    }
-
     Application.prototype.pointerClick = function(config) {
         this.keyInput.bind();
+
+        var point = this.screenToScene(config);
+
+        this.poly.addPoint({
+            x: point.x ,
+            y: point.y ,
+            z: 0
+        });
     }
 
     Application.prototype.pointerButton = function(config) {
@@ -229,8 +193,7 @@ define(["three", "system", "./simulation", "input"], function (THREE, System, Si
 
             var point = this.screenToScene(config);
 
-            this.poly.position.x = point.x;
-            this.poly.position.y = point.y;
+            this.poly.position( point );
         }
     }
 
