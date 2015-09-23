@@ -3,12 +3,15 @@
  */
 define(
     [
-        './scene/sceneobject',
+        './scene/polygon',
+        './scene/line',
     ] ,
     function (
-        SceneObject
+        Polygon,
+        Line
     ) {
         return {
-            SceneObject: SceneObject
+            Polygon: Polygon,
+            Line: Line
         }
     });

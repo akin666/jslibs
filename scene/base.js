@@ -3,13 +3,13 @@
  */
 
 define(["three", "../system/math"], function (THREE, Math) {
-    function SceneObject(config){
+    function Base(config){
         this.self = {};
         this.init(config);
         return this;
     }
 
-    SceneObject.prototype.destroy = function() {
+    Base.prototype.destroy = function() {
         var self = this.self;
         if(self.object != null) {
             if(self.scene != null) {
@@ -19,49 +19,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         }
     }
 
-    SceneObject.prototype.apply = function() {
-        this.destroy();
-        var self = this.self;
-
-        var object = null;
-        switch(self.type)
-        {
-            case 'line' :
-            {
-                var geom = new THREE.Geometry();
-                for (var i = 0; i < self.mesh.length; ++i) {
-                    geom.vertices.push(self.mesh[i]);
-                }
-                object = new THREE.Line( geom, self.material ) ;
-                break;
-            }
-            case 'polygon' :
-            {
-                var geom = new THREE.Geometry();
-                for (var i = 0; i < self.mesh.length; ++i) {
-                    geom.vertices.push(self.mesh[i]);
-                }
-                geom.vertices.push(self.mesh[0]);
-                object = new THREE.Line( geom, self.material ) ;
-                break;
-            }
-            default :
-                break;
-        }
-
-        if(object == null) {
-            return;
-        }
-
-        self.object = object;
-
-        self.object.position.x = self.position.x;
-        self.object.position.y = self.position.y;
-
-        self.scene.add(self.object);
-    }
-
-    SceneObject.prototype.position = function(val)
+    Base.prototype.position = function(val)
     {
         if(val == null) {
             return this.self.position;
@@ -73,7 +31,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         return val;
     }
 
-    SceneObject.prototype.mesh = function(val)
+    Base.prototype.mesh = function(val)
     {
         if(val == null) {
             return this.self.mesh;
@@ -85,7 +43,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         return val;
     }
 
-    SceneObject.prototype.material = function(val)
+    Base.prototype.material = function(val)
     {
         if(val == null) {
             return this.self.material;
@@ -97,27 +55,26 @@ define(["three", "../system/math"], function (THREE, Math) {
         return val;
     }
 
-    SceneObject.prototype.type = function(val)
+    Base.prototype.type = function()
     {
-        if(val == null) {
-            return this.self.type;
-        }
-        var self = this.self;
-        self.type = val;
-
-        this.apply();
-        return val;
+        return 'none';
     }
 
-    SceneObject.prototype.addPoint = function(point)
+    Base.prototype.toLocal = function(point)
+    {
+        if(point == null) {
+            return null;
+        }
+
+        point.applyMatrix4(new THREE.Matrix4().getInverse(this.self.object.matrix));
+        return point;
+    }
+
+    Base.prototype.addPoint = function(point)
     {
         if(point == null) {
             return;
         }
-
-        var self = this.self;
-
-        var matrix = new THREE.Matrix4().getInverse(self.object.matrix);
 
         var vec = new THREE.Vector3(
             point.x,
@@ -125,14 +82,14 @@ define(["three", "../system/math"], function (THREE, Math) {
             point.z
         );
 
-        vec.applyMatrix4(matrix);
+        this.toLocal(vec);
 
-        self.mesh.push(vec);
+        this.self.mesh.push(vec);
 
         this.apply();
     }
 
-    SceneObject.prototype.init = function(config) {
+    Base.prototype.init = function(config) {
         var self = this.self;
         this.destroy();
 
@@ -152,7 +109,6 @@ define(["three", "../system/math"], function (THREE, Math) {
                 [
                 'scene',
                 'mesh',
-                'type',
                 'material',
                 'position'
             ])) {
@@ -173,5 +129,5 @@ define(["three", "../system/math"], function (THREE, Math) {
         return self.object;
     }
 
-    return SceneObject;
+    return Base;
 });

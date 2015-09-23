@@ -76,9 +76,8 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
         });
 
         var un = 20;
-        this.poly = new Scene.SceneObject({
+        this.poly = new Scene.Polygon({
             scene: this.scene,
-            type: 'polygon',
             mesh: [
                 {x: -un, y: un, z:0 },
                 {x:  un, y: un, z:0 },
