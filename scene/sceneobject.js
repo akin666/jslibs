@@ -30,14 +30,11 @@ define(["three", "../system/math"], function (THREE, Math) {
             case 'polygon' :
             {
                 var geom = new THREE.Geometry();
-                var vertex = null;
                 for (var i = 0; i < self.mesh.length; ++i) {
-                    vertex = self.mesh[i];
-                    geom.vertices.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
+                    geom.vertices.push(self.mesh[i]);
                 }
                 if( this.type != 'line' ) {
-                    vertex = self.mesh[0];
-                    geom.vertices.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
+                    geom.vertices.push(self.mesh[0]);
                 }
                 object = new THREE.Line( geom, self.material ) ;
                 break;
@@ -114,11 +111,17 @@ define(["three", "../system/math"], function (THREE, Math) {
 
         var self = this.self;
 
-        var pp = [point.x,point.y,point.z];
-        self.object.matrix.applyToVector3Array(pp);
+        var matrix = new THREE.Matrix4().getInverse(self.object.matrix);
 
-        self.mesh.push({x: pp[0], y: pp[1], z: pp[2]});
-        //self.mesh.push(point);
+        var vec = new THREE.Vector3(
+            point.x,
+            point.y,
+            point.z
+        );
+
+        vec.applyMatrix4(matrix);
+
+        self.mesh.push(vec);
 
         this.apply();
     }
@@ -149,6 +152,14 @@ define(["three", "../system/math"], function (THREE, Math) {
             ])) {
             console.log("Failed to initialize SceneObject.");
             return;
+        }
+
+        // Rectify mesh.
+        var mesh = self.mesh;
+        self.mesh = [];
+        for(var i = 0; i < mesh.length ; ++i) {
+            var vertex = mesh[i];
+            self.mesh.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
         }
 
         this.apply();
