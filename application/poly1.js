@@ -78,12 +78,19 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
         var un = 20;
         this.poly = new Scene.Polygon({
             scene: this.scene,
-            mesh: [
-                {x: -un, y: un, z:0 },
-                {x:  un, y: un, z:0 },
-                {x:  un, y:-un, z:0 },
-                {x: -un, y:-un, z:0 },
-            ],
+                /*
+                 mesh: [
+                 {x: -un, y: un, z:0 },
+                 {x:  un, y: un, z:0 },
+                 {x:  un, y:-un, z:0 },
+                 {x: -un, y:-un, z:0 },
+                 ],*/
+                mesh: [
+                    new THREE.Vector3( -un, un, 0 ),
+                    new THREE.Vector3(  un, un, 0 ),
+                    new THREE.Vector3(  un,-un, 0 ),
+                    new THREE.Vector3( -un,-un, 0 ),
+                ],
             position: {
                 x: -20,
                 y: -60,

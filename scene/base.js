@@ -117,11 +117,13 @@ define(["three", "../system/math"], function (THREE, Math) {
         }
 
         // Rectify mesh.
-        var mesh = self.mesh;
-        self.mesh = [];
-        for(var i = 0; i < mesh.length ; ++i) {
-            var vertex = mesh[i];
-            self.mesh.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
+        if( !(self.mesh[0] instanceof THREE.Vector3) ) {
+            var mesh = self.mesh;
+            self.mesh = [];
+            for (var i = 0; i < mesh.length; ++i) {
+                var vertex = mesh[i];
+                self.mesh.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
+            }
         }
 
         this.apply();
