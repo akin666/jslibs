@@ -27,15 +27,21 @@ define(["three", "../system/math"], function (THREE, Math) {
         switch(self.type)
         {
             case 'line' :
+            {
+                var geom = new THREE.Geometry();
+                for (var i = 0; i < self.mesh.length; ++i) {
+                    geom.vertices.push(self.mesh[i]);
+                }
+                object = new THREE.Line( geom, self.material ) ;
+                break;
+            }
             case 'polygon' :
             {
                 var geom = new THREE.Geometry();
                 for (var i = 0; i < self.mesh.length; ++i) {
                     geom.vertices.push(self.mesh[i]);
                 }
-                if( this.type != 'line' ) {
-                    geom.vertices.push(self.mesh[0]);
-                }
+                geom.vertices.push(self.mesh[0]);
                 object = new THREE.Line( geom, self.material ) ;
                 break;
             }
