@@ -96,6 +96,8 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
             polygon: this.polygon,
         });
 
+        this.action = null;
+
         // start simulation right away...
         this.update();
 
@@ -110,11 +112,13 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
 
         var point = this.screenToScene(config);
 
+        /*
         this.editor.addPoint({
             x: point.x ,
             y: point.y ,
             z: 0
         });
+        */
     }
 
     Application.prototype.pointerButton = function(config) {
@@ -129,6 +133,17 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
             data.origo.y = config.y;
             data.delta.x = 0;
             data.delta.y = 0;
+
+            var point = this.screenToScene(config);
+            if( this.action == null ) {
+                this.action = this.editor.pointAction({
+                    position: new THREE.Vector3(
+                        point.x,
+                        point.y,
+                        0.0),
+                    lineToSplit: 0
+                });
+            }
         }
         else {
             // "commit"
@@ -136,6 +151,17 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
             data.value.y += data.delta.y;
             data.delta.x = 0;
             data.delta.y = 0;
+
+            if( this.action != null ){
+                var point = this.screenToScene(config);
+                this.action.commit({
+                    position: new THREE.Vector3(
+                        point.x,
+                        point.y,
+                        0.0 )
+                });
+                this.action = null;
+            }
         }
     }
 
@@ -195,7 +221,13 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
 
             var point = this.screenToScene(config);
 
-            this.editor.position( point );
+            if( this.action != null ){
+                this.action.move(new THREE.Vector3(
+                        point.x,
+                        point.y,
+                        0.0 ));
+            }
+            //this.editor.position( point );
         }
     }
 

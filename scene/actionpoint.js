@@ -20,7 +20,7 @@ define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
 
     Action.prototype.move = function(val) {
         var self = this.self;
-        var i = self.line.count();
+        var i = self.line.size();
         if( i <= 0 ) {
             return;
         }
@@ -37,7 +37,11 @@ define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
         self.line.setPointAt(i , val);
     }
 
-    Action.prototype.commit = function() {
+    Action.prototype.commit = function(config) {
+        var self = this.self;
+        this.destroy();
+
+        self.target.addPointAt(self.index + 1 , config.position);
     }
 
     Action.prototype.revert = function() {
@@ -55,7 +59,7 @@ define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
 
         var a = self.target.getPointAt( self.index );
         var b = config.point;
-        var c = self.target.getPointAt( self.index +1 );
+        var c = self.target.getPointAt( self.index + 1 );
 
         var mesh = [
         ];

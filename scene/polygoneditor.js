@@ -74,11 +74,10 @@ define(["three", "../system/math", "./polygon", "./point", "./actionpoint"], fun
     {
         var self = this.self;
 
-        // between what 2 vertex..
-        // etc. Object that can add the vertex..
         var action = new ActionPoint({
             target: self.polygon,
-            index: 0 // TODO Real index
+            point: config.position,
+            index: config.lineToSplit
         });
 
         return action;
