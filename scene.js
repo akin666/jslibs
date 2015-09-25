@@ -5,13 +5,19 @@ define(
     [
         './scene/polygon',
         './scene/line',
+        './scene/point',
+        './scene/polygoneditor',
     ] ,
     function (
         Polygon,
-        Line
+        Line,
+        Point,
+        PolygonEditor
     ) {
         return {
             Polygon: Polygon,
-            Line: Line
+            Line: Line,
+            Point: Point,
+            PolygonEditor: PolygonEditor
         }
     });

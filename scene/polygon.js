@@ -5,7 +5,6 @@
 define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
     function Polygon(config){
         Base.call( this , config );
-
         return this;
     }
 
@@ -32,7 +31,10 @@ define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
         self.object.position.x = self.position.x;
         self.object.position.y = self.position.y;
 
-        self.scene.add(self.object);
+        if(self.attached)
+        {
+            this.attach(true);
+        }
     }
 
     return Polygon;

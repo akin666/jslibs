@@ -76,28 +76,24 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
         });
 
         var un = 20;
-        this.poly = new Scene.Polygon({
+
+        this.polygon = new Scene.Polygon({
             scene: this.scene,
-                /*
-                 mesh: [
-                 {x: -un, y: un, z:0 },
-                 {x:  un, y: un, z:0 },
-                 {x:  un, y:-un, z:0 },
-                 {x: -un, y:-un, z:0 },
-                 ],*/
-                mesh: [
-                    new THREE.Vector3( -un, un, 0 ),
-                    new THREE.Vector3(  un, un, 0 ),
-                    new THREE.Vector3(  un,-un, 0 ),
-                    new THREE.Vector3( -un,-un, 0 ),
-                ],
-            position: {
-                x: -20,
-                y: -60,
-            },
+            attach: true,
+            mesh: [
+                new THREE.Vector3( -un, un, 0 ),
+                new THREE.Vector3(  un, un, 0 ),
+                new THREE.Vector3(  un,-un, 0 ),
+                new THREE.Vector3( -un,-un, 0 ),
+            ],
             material: new THREE.LineBasicMaterial( {
-                color: 0xFF99BB,
-            })
+                color: 0xFFFFFF,
+            }),
+            position: new THREE.Vector3( -20, -60, 0 )
+        });
+
+        this.editor = new Scene.PolygonEditor({
+            polygon: this.polygon,
         });
 
         // start simulation right away...
@@ -114,7 +110,7 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
 
         var point = this.screenToScene(config);
 
-        this.poly.addPoint({
+        this.editor.addPoint({
             x: point.x ,
             y: point.y ,
             z: 0
@@ -199,7 +195,7 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
 
             var point = this.screenToScene(config);
 
-            this.poly.position( point );
+            this.editor.position( point );
         }
     }
 

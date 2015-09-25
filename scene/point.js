@@ -1,17 +1,17 @@
 /**
  * Created by akin on 22/09/15.
  */
-define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
-    function Line(config){
-        Base.call( this , config );
 
+define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
+    function Point(config){
+        Base.call( this , config );
         return this;
     }
 
     // specify inheritance
-    Line.prototype = Object.create( Base.prototype );
+    Point.prototype = Object.create( Base.prototype );
 
-    Line.prototype.apply = function() {
+    Point.prototype.apply = function() {
         this.destroy();
         var self = this.self;
 
@@ -19,7 +19,8 @@ define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
         for (var i = 0; i < self.mesh.length; ++i) {
             geom.vertices.push(self.mesh[i]);
         }
-        var object = new THREE.Line( geom, self.material ) ;
+
+        var object = new THREE.Points( geom, self.material ) ;
 
         if(object == null) {
             return;
@@ -36,5 +37,5 @@ define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
         }
     }
 
-    return Line;
+    return Point;
 });

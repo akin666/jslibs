@@ -4,7 +4,10 @@
 
 define(["three", "../system/math"], function (THREE, Math) {
     function Base(config){
-        this.self = {};
+        this.self = {
+            attached: false,
+            object: null,
+        };
         this.init(config);
         return this;
     }
@@ -19,6 +22,25 @@ define(["three", "../system/math"], function (THREE, Math) {
         }
     }
 
+    Base.prototype.attach = function(val) {
+        if(val == null) {
+            return this.self.attached;
+        }
+        var self = this.self;
+
+        if(self.object != null) {
+            self.attached = val;
+            if(val)
+            {
+                self.scene.add(self.object);
+            }
+            else
+            {
+                self.scene.remove(self.object);
+            }
+        }
+    }
+
     Base.prototype.position = function(val)
     {
         if(val == null) {
@@ -26,8 +48,25 @@ define(["three", "../system/math"], function (THREE, Math) {
         }
         var self = this.self;
         self.position = val;
-        self.object.position.x = self.position.x;
-        self.object.position.y = self.position.y;
+        if( self.object != null ) {
+            self.object.position.x = self.position.x;
+            self.object.position.y = self.position.y;
+        }
+        return val;
+    }
+
+    Base.prototype.scene = function(val)
+    {
+        if(val == null) {
+            return this.self.scene;
+        }
+
+        this.destroy();
+
+        var self = this.self;
+        self.scene = val;
+
+        this.apply();
         return val;
     }
 
@@ -89,9 +128,58 @@ define(["three", "../system/math"], function (THREE, Math) {
         this.apply();
     }
 
+    Base.prototype.addPointAt = function(index, point)
+    {
+        if(point == null) {
+            return;
+        }
+
+        this.self.mesh.splice(index, 0, point);
+
+        this.apply();
+    }
+
+    Base.prototype.setPointAt = function(index, point)
+    {
+        if(point == null) {
+            return;
+        }
+
+        this.self.mesh[index] = point;
+
+        this.apply();
+    }
+
+    Base.prototype.getPointAt = function(index)
+    {
+        var self = this.self;
+        if( self.mesh == null ) {
+            return null;
+        }
+
+        var len = self.mesh.length;
+        while(index < 0) index += len;
+        while(index >= len) index -= len;
+
+        return self.mesh[index];
+    }
+
+    Base.prototype.size = function()
+    {
+        var self = this.self;
+        if( self.mesh == null ) {
+            return 0;
+        }
+        return self.mesh.length;
+    }
+
     Base.prototype.init = function(config) {
         var self = this.self;
         this.destroy();
+
+        if( config == null ) {
+            return;
+        }
 
         // copy referenced properties from config.
         if(!(function(target,source,properties){
@@ -112,7 +200,7 @@ define(["three", "../system/math"], function (THREE, Math) {
                 'material',
                 'position'
             ])) {
-            console.log("Failed to initialize SceneObject.");
+            console.log("Failed to initialize Base scene object.");
             return;
         }
 
@@ -124,6 +212,11 @@ define(["three", "../system/math"], function (THREE, Math) {
                 var vertex = mesh[i];
                 self.mesh.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
             }
+        }
+
+        if(config.attach != null && config.attach )
+        {
+            self.attached = true;
         }
 
         this.apply();
