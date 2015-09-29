@@ -36,7 +36,7 @@ define(function () {
     }
     // http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
     math.modulo = function( a , n ) {
-        return (value < min) ? min : ((value > max) ? max : value);
+        return a - (n * Math.floor( a / n ));
     }
     math.findClosestPoint = function( point , points ) {
         if(points == null || points.length < 1) {
@@ -181,4 +181,6 @@ define(function () {
     math.radToDeg = function( angle ) {
         return angle * math.RAD2DEG;
     }
+
+    return math;
 });

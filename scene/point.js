@@ -12,29 +12,21 @@ define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
     Point.prototype = Object.create( Base.prototype );
 
     Point.prototype.apply = function() {
-        this.destroy();
+        this.destroyGraphics();
         var self = this.self;
 
         var geom = new THREE.Geometry();
         for (var i = 0; i < self.mesh.length; ++i) {
             geom.vertices.push(self.mesh[i]);
         }
-
         var object = new THREE.Points( geom, self.material ) ;
 
         if(object == null) {
             return;
         }
 
-        self.object = object;
-
-        self.object.position.x = self.position.x;
-        self.object.position.y = self.position.y;
-
-        if(self.attached)
-        {
-            this.attach(true);
-        }
+        self.graphics = object;
+        self.object.add(self.graphics);
     }
 
     return Point;

@@ -2,103 +2,159 @@
  * Created by akin on 22/09/15.
  */
 
-define(["three", "../system/math", "./polygon", "./point", "./actionpoint"], function (THREE, Math, Polygon, Point, ActionPoint) {
+define([
+    "three",
+    "../system/math",
+    "input",
+    "./polygon",
+    "./point",
+    "./actionpoint",
+    "./effectlinetrack"
+], function (
+    THREE,
+    Math,
+    Input,
+    Polygon,
+    Point,
+    ActionPoint,
+    EffectLineTrack
+) {
     function Editor(config){
         this.self = {};
 
         var self = this.self;
 
-        self.polygon = new Polygon();
-        self.point = new Point();
+        self.polygon = null;
 
         this.init(config);
         return this;
-    }
-
-    Editor.prototype.position = function(val)
-    {
-        var self = this.self;
-
-        self.point.position(val);
-        return self.polygon.position(val);
-    }
-
-    Editor.prototype.mesh = function(val)
-    {
-        var self = this.self;
-
-        self.point.mesh(val);
-        return self.polygon.mesh(val);
-    }
-
-    Editor.prototype.addPoint = function(point)
-    {
-        var self = this.self;
-
-        self.point.addPoint(point);
-        self.polygon.addPoint(point);
-    }
-
-    Editor.prototype.addPointAt = function(index, point)
-    {
-        var self = this.self;
-
-        self.point.addPointAt(point);
-        self.polygon.addPointAt(point);
-    }
-
-    Editor.prototype.setPointAt = function(index, point)
-    {
-        var self = this.self;
-
-        self.point.setPointAt(index, point);
-        self.polygon.setPointAt(index, point);
-    }
-
-    Editor.prototype.apply = function()
-    {
-        var self = this.self;
-
-        self.point.apply();
-        self.polygon.apply();
-    }
-
-    Editor.prototype.nearestAction = function(config)
-    {
-        // Line
-        // Vertex
-        return null;
-    }
-
-    Editor.prototype.pointAction = function(config)
-    {
-        var self = this.self;
-
-        var action = new ActionPoint({
-            target: self.polygon,
-            point: config.position,
-            index: config.lineToSplit
-        });
-
-        return action;
     }
 
     Editor.prototype.init = function(config) {
         var self = this.self;
 
         self.polygon = config.polygon;
+        self.element = config.element;
 
+        self.width = self.element.width();
+        self.height = self.element.height();
+
+        this.mouseInput = new Input.Mouse({
+            element: self.element,
+            target: this
+        });
+        this.touchInput = new Input.Touch({
+            element: self.element,
+            target: this
+        });
+        this.keyInput = new Input.Keyboard({
+            element: self.element,
+            target: this
+        });
+
+        /*
         self.point.init({
-            scene: self.polygon.scene(),
-            attach: self.polygon.attach(),
+            parent: self.polygon.object(),
             mesh: self.polygon.mesh(),
-            position: self.polygon.position(),
             material: new THREE.PointsMaterial( {
                 color: 0xFF99FF,
                 size: 5.0,
                 sizeAttenuation: false
             })
         });
+        */
+    }
+
+    Editor.prototype.screenToScene = function(point)
+    {
+        var self = this.self;
+        return new THREE.Vector3(
+                point.x - (self.width / 2.0),
+                -point.y + (self.height / 2.0),
+                0.0 );
+    }
+
+    Editor.prototype.pointerClick = function(config) {
+        this.keyInput.bind();
+
+        var point = this.screenToScene(config);
+    }
+
+    Editor.prototype.pointerButton = function(config) {
+        var button = config.button;
+        if( button == 0 ) {
+            return;
+        }
+        var point = this.screenToScene(config);
+        var point3 = new THREE.Vector3(
+            point.x,
+            point.y,
+            0.0 );
+
+        var self = this.self;
+        if( config.down ) {
+            if( this.action != null ) {
+                var next = this.action.commit({
+                    target: self.polygon,
+                    point: point3
+                });
+                this.action.destroy();
+                this.action = next;
+            }
+        }
+        else {
+            // "commit"
+            if( this.action != null ){
+                var next = this.action.commit({
+                    target: self.polygon,
+                    point: point3
+                });
+                this.action.destroy();
+                this.action = next;
+            }
+        }
+    }
+
+    Editor.prototype.pointerAction = function(config) {
+        if (config.type == "end") {
+            this.keyInput.unbind();
+        }
+        else if (config.type == "cancel") {
+            this.keyInput.unbind();
+        }
+        else if( config.type == "continue" ) {
+            this.keyInput.bind();
+        }
+    }
+
+    Editor.prototype.pointerMove = function(config) {
+        var point = this.screenToScene(config);
+        var point3 = new THREE.Vector3(
+            point.x,
+            point.y,
+            0.0 );
+        var self = this.self;
+
+        if (config.button == null || config.button.length > 0) {
+        }
+        else {
+            if( this.action == null ) {
+                var self = this.self;
+                this.action = new EffectLineTrack({
+                    target: self.polygon,
+                    point: point3,
+                    action: ActionPoint
+                });
+            }
+        }
+
+        if( this.action != null ){
+            this.action.move(point3);
+        }
+    }
+
+    Editor.prototype.keyPress = function(config) {
+        console.log("ThreeApp: key: " + config.key + " code: " + config.code);
     }
 
     return Editor;

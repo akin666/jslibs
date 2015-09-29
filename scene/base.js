@@ -1,12 +1,15 @@
 /**
  * Created by akin on 22/09/15.
+ *
+ * Object that has a dynamic 'graphics' child.
  */
 
 define(["three", "../system/math"], function (THREE, Math) {
     function Base(config){
         this.self = {
             attached: false,
-            object: null,
+            object: new THREE.Object3D(),
+            graphics: null
         };
         this.init(config);
         return this;
@@ -15,92 +18,104 @@ define(["three", "../system/math"], function (THREE, Math) {
     Base.prototype.destroy = function() {
         var self = this.self;
         if(self.object != null) {
-            if(self.scene != null) {
-                self.scene.remove(self.object);
+            if(self.parent != null) {
+                self.parent.remove(self.object);
             }
             self.object = null;
         }
     }
 
+    Base.prototype.destroyGraphics = function() {
+        var self = this.self;
+        if(self.graphics != null) {
+            self.object.remove(self.graphics);
+            self.graphics = null;
+        }
+    }
+
     Base.prototype.attach = function(val) {
         if(val == null) {
-            return this.self.attached;
+            return;
         }
         var self = this.self;
 
-        if(self.object != null) {
-            self.attached = val;
-            if(val)
-            {
-                self.scene.add(self.object);
+        if(val)
+        {
+            if( self.object.parent == null ) {
+                self.parent.add(self.object);
             }
-            else
-            {
-                self.scene.remove(self.object);
+        }
+        else
+        {
+            if( self.object.parent != null ) {
+                self.parent.remove(self.object);
             }
         }
     }
 
-    Base.prototype.position = function(val)
-    {
-        if(val == null) {
-            return this.self.position;
-        }
+    Base.prototype.position = function(val) {
         var self = this.self;
-        self.position = val;
-        if( self.object != null ) {
-            self.object.position.x = self.position.x;
-            self.object.position.y = self.position.y;
+        if(val == null) {
+            return self.object.position;
         }
+        self.object.position.x = val.x;
+        self.object.position.y = val.y;
+        self.object.position.z = val.z;
+
         return val;
     }
 
-    Base.prototype.scene = function(val)
-    {
+    Base.prototype.parent = function(val) {
+        var self = this.self;
         if(val == null) {
-            return this.self.scene;
+            return self.parent;
         }
 
-        this.destroy();
+        if(val === self.object.parent) {
+            return val;
+        }
 
-        var self = this.self;
-        self.scene = val;
+        this.detach();
+        self.parent = val;
+        this.attach();
 
-        this.apply();
         return val;
     }
 
-    Base.prototype.mesh = function(val)
-    {
-        if(val == null) {
-            return this.self.mesh;
-        }
+    Base.prototype.object = function() {
         var self = this.self;
+        return self.object;
+    }
+
+    Base.prototype.mesh = function(val) {
+        var self = this.self;
+        if(val == null) {
+            return self.mesh;
+        }
         self.mesh = val;
 
         this.apply();
+
         return val;
     }
 
     Base.prototype.material = function(val)
     {
-        if(val == null) {
-            return this.self.material;
-        }
         var self = this.self;
+        if(val == null) {
+            return self.material;
+        }
         self.material = val;
 
         this.apply();
         return val;
     }
 
-    Base.prototype.type = function()
-    {
+    Base.prototype.type = function() {
         return 'none';
     }
 
-    Base.prototype.toLocal = function(point)
-    {
+    Base.prototype.toLocal = function(point) {
         if(point == null) {
             return null;
         }
@@ -109,8 +124,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         return point;
     }
 
-    Base.prototype.addPoint = function(point)
-    {
+    Base.prototype.addPoint = function(point) {
         if(point == null) {
             return;
         }
@@ -128,8 +142,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         this.apply();
     }
 
-    Base.prototype.addPointAt = function(index, point)
-    {
+    Base.prototype.addPointAt = function(index, point) {
         if(point == null) {
             return;
         }
@@ -139,8 +152,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         this.apply();
     }
 
-    Base.prototype.setPointAt = function(index, point)
-    {
+    Base.prototype.setPointAt = function(index, point) {
         if(point == null) {
             return;
         }
@@ -150,8 +162,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         this.apply();
     }
 
-    Base.prototype.getPointAt = function(index)
-    {
+    Base.prototype.getPointAt = function(index) {
         var self = this.self;
         if( self.mesh == null ) {
             return null;
@@ -164,8 +175,7 @@ define(["three", "../system/math"], function (THREE, Math) {
         return self.mesh[index];
     }
 
-    Base.prototype.size = function()
-    {
+    Base.prototype.size = function() {
         var self = this.self;
         if( self.mesh == null ) {
             return 0;
@@ -175,34 +185,19 @@ define(["three", "../system/math"], function (THREE, Math) {
 
     Base.prototype.init = function(config) {
         var self = this.self;
-        this.destroy();
+        this.destroyGraphics();
 
         if( config == null ) {
             return;
         }
 
-        // copy referenced properties from config.
-        if(!(function(target,source,properties){
-                for(var i = 0; i < properties.length ;++i) {
-                    if(source[properties[i]] == null) {
-                        console.log("No property called " + properties[i]);
-                        return false;
-                    }
-                    target[properties[i]] = source[properties[i]];
-                }
-                return true;
-            })(
-                self,
-                config,
-                [
-                'scene',
-                'mesh',
-                'material',
-                'position'
-            ])) {
-            console.log("Failed to initialize Base scene object.");
-            return;
+        if( config.position != null ) {
+            self.object.position = config.position;
         }
+
+        self.parent = config.parent;
+        self.mesh = config.mesh;
+        self.material = config.material;
 
         // Rectify mesh.
         if( !(self.mesh[0] instanceof THREE.Vector3) ) {
@@ -210,16 +205,17 @@ define(["three", "../system/math"], function (THREE, Math) {
             self.mesh = [];
             for (var i = 0; i < mesh.length; ++i) {
                 var vertex = mesh[i];
-                self.mesh.push(new THREE.Vector3(vertex.x, vertex.y, vertex.z));
+                self.mesh.push(
+                    new THREE.Vector3(vertex.x, vertex.y, vertex.z)
+                );
             }
         }
 
-        if(config.attach != null && config.attach )
-        {
-            self.attached = true;
-        }
-
         this.apply();
+
+        if( config.attach == null || config.attach === true ) {
+            this.attach(true);
+        }
 
         return self.object;
     }

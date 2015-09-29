@@ -12,7 +12,7 @@ define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
     Polygon.prototype = Object.create( Base.prototype );
 
     Polygon.prototype.apply = function() {
-        this.destroy();
+        this.destroyGraphics();
         var self = this.self;
 
         var geom = new THREE.Geometry();
@@ -26,15 +26,8 @@ define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
             return;
         }
 
-        self.object = object;
-
-        self.object.position.x = self.position.x;
-        self.object.position.y = self.position.y;
-
-        if(self.attached)
-        {
-            this.attach(true);
-        }
+        self.graphics = object;
+        self.object.add(self.graphics);
     }
 
     return Polygon;
