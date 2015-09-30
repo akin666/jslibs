@@ -9,7 +9,7 @@ define([
     "./polygon",
     "./point",
     "./actionpoint",
-    "./effectlinetrack"
+    "./actionline"
 ], function (
     THREE,
     Math,
@@ -17,14 +17,15 @@ define([
     Polygon,
     Point,
     ActionPoint,
-    EffectLineTrack
+    ActionLine
 ) {
     function Editor(config){
         this.self = {};
-
         var self = this.self;
 
+        self.action = null;
         self.polygon = null;
+        self.point = new Point();
 
         this.init(config);
         return this;
@@ -52,7 +53,6 @@ define([
             target: this
         });
 
-        /*
         self.point.init({
             parent: self.polygon.object(),
             mesh: self.polygon.mesh(),
@@ -62,7 +62,6 @@ define([
                 sizeAttenuation: false
             })
         });
-        */
     }
 
     Editor.prototype.screenToScene = function(point)
@@ -93,24 +92,20 @@ define([
 
         var self = this.self;
         if( config.down ) {
-            if( this.action != null ) {
-                var next = this.action.commit({
+            if( self.action != null ) {
+                self.action.commit({
                     target: self.polygon,
                     point: point3
                 });
-                this.action.destroy();
-                this.action = next;
             }
         }
         else {
             // "commit"
-            if( this.action != null ){
-                var next = this.action.commit({
+            if( self.action != null ){
+                self.action.commit({
                     target: self.polygon,
                     point: point3
                 });
-                this.action.destroy();
-                this.action = next;
             }
         }
     }
@@ -138,18 +133,47 @@ define([
         if (config.button == null || config.button.length > 0) {
         }
         else {
-            if( this.action == null ) {
+            if( self.action == null ) {
                 var self = this.self;
-                this.action = new EffectLineTrack({
+                // Yes, this, clusterfuck does it all.
+                var action = new ActionLine({
                     target: self.polygon,
-                    point: point3,
-                    action: ActionPoint
+                    point: point3
+                });
+                self.action = action;
+
+                action.promise().then(function(config) {
+                    // Success
+                    // Clean previous action..
+                    if( self.action != null ) {
+                        self.action.destroy();
+                        self.action = null;
+                    }
+                    var pointAction = new ActionPoint(config);
+                    self.action = pointAction;
+
+                    pointAction.promise().then(function(config) {
+                        // Success
+                        // Clean previous action..
+                        if( self.action != null ) {
+                            self.action.destroy();
+                            self.action = null;
+                        }
+
+                        self.polygon.addPointAt(config.index , config.point);
+                        self.point.addPointAt(config.index , config.point);
+                    },
+                    function(config) {
+                        // Fail
+                    });
+                }, function(config){
+                    // Fail
                 });
             }
         }
 
-        if( this.action != null ){
-            this.action.move(point3);
+        if( self.action != null ){
+            self.action.move(point3);
         }
     }
 

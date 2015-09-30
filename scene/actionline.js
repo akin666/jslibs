@@ -1,15 +1,14 @@
 /**
  * Created by akin on 22/09/15.
  */
-define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
+define(["three", "../system/math", "./line", "./actionbase"], function (THREE, Math, Line, ActionBase) {
     function Action(config){
-        this.self = {
-            target: null,
-            line: new Line()
-        };
-        this.init(config);
+        ActionBase.call( this , config );
         return this;
     }
+
+    // specify inheritance
+    Action.prototype = Object.create( ActionBase.prototype );
 
     Action.prototype.destroy = function() {
         var self = this.self;
@@ -38,10 +37,10 @@ define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
 
     Action.prototype.commit = function(config) {
         var self = this.self;
-        var index = this.getClosestIndex(config.point);
 
-        config.index = index;
-        return new self.action(config);
+        config.index = this.getClosestIndex(config.point);
+
+        self.deferred.resolve(config);
     }
 
     Action.prototype.init = function(config) {
@@ -50,7 +49,6 @@ define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
             return;
         }
         self.target = config.target;
-        self.action = config.action;
 
         var index = this.getClosestIndex(config.point);
 
@@ -67,14 +65,21 @@ define(["three", "../system/math", "./line"], function (THREE, Math, Line) {
             mesh.push(b);
         }
 
-        self.line.init({
+        var lconfig = {
             parent: self.target.object(),
             mesh: mesh,
-            material: new THREE.LineBasicMaterial( {
+            material: new THREE.LineBasicMaterial({
                 color: 0xFF00FF,
                 linewidth: 2.0
             })
-        });
+        };
+
+        if( self.line == null ) {
+            self.line = new Line(lconfig);
+        }
+        else {
+            self.line.init(lconfig);
+        }
     }
 
     return Action;

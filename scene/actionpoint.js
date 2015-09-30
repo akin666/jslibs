@@ -1,15 +1,14 @@
 /**
  * Created by akin on 22/09/15.
  */
-define(["three", "system/math", "./line"], function (THREE, Math, Line) {
+define(["three", "system/math", "./line", "./actionbase"], function (THREE, Math, Line, ActionBase) {
     function Action(config){
-        this.self = {
-            target: null,
-            line: new Line()
-        };
-        this.init(config);
+        ActionBase.call( this , config );
         return this;
     }
+
+    // specify inheritance
+    Action.prototype = Object.create( ActionBase.prototype );
 
     Action.prototype.destroy = function() {
         var self = this.self;
@@ -39,11 +38,10 @@ define(["three", "system/math", "./line"], function (THREE, Math, Line) {
 
     Action.prototype.commit = function(config) {
         var self = this.self;
-        this.destroy();
 
-        self.target.addPointAt(self.index + 1 , config.point);
+        config.index = self.index + 1;
 
-        return null;
+        self.deferred.resolve(config);
     }
 
     Action.prototype.revert = function() {
@@ -54,6 +52,7 @@ define(["three", "system/math", "./line"], function (THREE, Math, Line) {
         if(config == null) {
             return;
         }
+        // config.edit? == true
 
         self.target = config.target;
         self.index = config.index;
@@ -75,14 +74,21 @@ define(["three", "system/math", "./line"], function (THREE, Math, Line) {
             mesh.push(c);
         }
 
-        self.line.init({
+        var lconfig = {
             parent: self.target.object(),
             attach: true,
             mesh: mesh,
             material: new THREE.LineBasicMaterial( {
                 color: 0xFFAAAA,
             })
-        });
+        };
+
+        if( self.line == null ) {
+            self.line = new Line(lconfig);
+        }
+        else {
+            self.line.init(lconfig);
+        }
     }
 
     return Action;
