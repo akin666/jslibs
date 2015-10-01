@@ -124,35 +124,20 @@ define(["three", "../system/math"], function (THREE, Math) {
         return point;
     }
 
-    Base.prototype.addPoint = function(point) {
-        if(point == null) {
-            return;
+    Base.prototype.addPoint = function(first, point) {
+        if( (first instanceof THREE.Vector3) ) {
+            this.self.mesh.push(first);
         }
-
-        var vec = new THREE.Vector3(
-            point.x,
-            point.y,
-            point.z
-        );
-
-        this.toLocal(vec);
-
-        this.self.mesh.push(vec);
-
+        else {
+            if (point == null) {
+                return;
+            }
+            this.self.mesh.splice(first, 0, point);
+        }
         this.apply();
     }
 
-    Base.prototype.addPointAt = function(index, point) {
-        if(point == null) {
-            return;
-        }
-
-        this.self.mesh.splice(index, 0, point);
-
-        this.apply();
-    }
-
-    Base.prototype.setPointAt = function(index, point) {
+    Base.prototype.setPoint = function(index, point) {
         if(point == null) {
             return;
         }
@@ -162,7 +147,13 @@ define(["three", "../system/math"], function (THREE, Math) {
         this.apply();
     }
 
-    Base.prototype.getPointAt = function(index) {
+    Base.prototype.removePoint = function(index) {
+        this.self.mesh.splice(index, 1);
+
+        this.apply();
+    }
+
+    Base.prototype.getPoint = function(index) {
         var self = this.self;
         if( self.mesh == null ) {
             return null;

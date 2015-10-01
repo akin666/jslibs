@@ -20,7 +20,7 @@ define(["system"], function (System) {
     }
 
     Application.prototype.skippedUpdate = function(config){
-        console.log("Skipped " + config.delta + " seconds.")
+        console.log("Skipped " + config.delta + " seconds.");
     }
 
     Application.prototype.update = function() {

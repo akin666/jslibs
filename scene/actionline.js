@@ -22,11 +22,11 @@ define(["three", "../system/math", "./line", "./actionbase"], function (THREE, M
 
         var index = this.getClosestIndex(val);
 
-        var a = self.target.getPointAt( index );
-        var b = self.target.getPointAt( index + 1 );
+        var a = self.target.getPoint( index );
+        var b = self.target.getPoint( index + 1 );
 
-        self.line.setPointAt(0 , a);
-        self.line.setPointAt(1 , b);
+        self.line.setPoint(0 , a);
+        self.line.setPoint(1 , b);
     }
 
     Action.prototype.getClosestIndex = function(point) {
@@ -52,8 +52,8 @@ define(["three", "../system/math", "./line", "./actionbase"], function (THREE, M
 
         var index = this.getClosestIndex(config.point);
 
-        var a = self.target.getPointAt( index );
-        var b = self.target.getPointAt( index + 1 );
+        var a = self.target.getPoint( index );
+        var b = self.target.getPoint( index + 1 );
 
         var mesh = [
         ];

@@ -1,7 +1,18 @@
 /**
  * Created by akin on 02/09/15.
  */
-define(["three", "system", "scene", "./simulation", "input"], function (THREE, System, Scene, Simulation, Input) {
+define([
+    "three",
+    "system",
+    "scene",
+    "./simulation",
+    "input"],
+    function (
+        THREE,
+        System,
+        Scene,
+        Simulation,
+        Input) {
     function Application(config){
         Simulation.call( this , config );
 
@@ -12,6 +23,8 @@ define(["three", "system", "scene", "./simulation", "input"], function (THREE, S
         this.fov = 75;
         this.near = 0.1;
         this.far = 1000;
+
+        console.log("Canvas size is " + this.width + "x" + this.height);
 
         this.scene = new THREE.Scene();
 

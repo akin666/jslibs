@@ -58,7 +58,7 @@ define([
             mesh: self.polygon.mesh(),
             material: new THREE.PointsMaterial( {
                 color: 0xFF99FF,
-                size: 5.0,
+                size: 10.0,
                 sizeAttenuation: false
             })
         });
@@ -68,9 +68,9 @@ define([
     {
         var self = this.self;
         return new THREE.Vector3(
-                point.x - (self.width / 2.0),
-                -point.y + (self.height / 2.0),
-                0.0 );
+            point.x - (self.width / 2.0),
+            -point.y + (self.height / 2.0),
+            0.0 );
     }
 
     Editor.prototype.pointerClick = function(config) {
@@ -142,17 +142,8 @@ define([
                 });
                 self.action = action;
 
-                action.promise().then(function(config) {
-                    // Success
-                    // Clean previous action..
-                    if( self.action != null ) {
-                        self.action.destroy();
-                        self.action = null;
-                    }
-                    var pointAction = new ActionPoint(config);
-                    self.action = pointAction;
-
-                    pointAction.promise().then(function(config) {
+                action.promise().then(
+                    function(config) {
                         // Success
                         // Clean previous action..
                         if( self.action != null ) {
@@ -160,15 +151,44 @@ define([
                             self.action = null;
                         }
 
-                        self.polygon.addPointAt(config.index , config.point);
-                        self.point.addPointAt(config.index , config.point);
-                    },
-                    function(config) {
+                        config.edit = false;
+                        var index = Math.findClosestPoint( config.point , self.polygon.mesh() );
+
+                        // is the click close enough?
+                        var p1 = self.polygon.getPoint( index );
+                        var distance = config.point.distanceTo( p1 );
+
+                        if( distance <= 20 ) {
+                            config.edit = true;
+                            config.index = index;
+                        }
+
+                        var pointAction = new ActionPoint(config);
+                        self.action = pointAction;
+
+                        pointAction.promise().then(function(config) {
+                                // Success
+                                // Clean previous action..
+                                if( self.action != null ) {
+                                    self.action.destroy();
+                                    self.action = null;
+                                }
+
+                                if( config.edit ) {
+                                    self.polygon.setPoint(config.index - 1, config.point);
+                                    self.point.setPoint(config.index - 1, config.point);
+                                }
+                                else {
+                                    self.polygon.addPoint(config.index, config.point);
+                                    self.point.addPoint(config.index, config.point);
+                                }
+                            },
+                            function(config) {
+                                // Fail
+                            });
+                    }, function(config){
                         // Fail
                     });
-                }, function(config){
-                    // Fail
-                });
             }
         }
 

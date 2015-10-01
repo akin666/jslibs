@@ -33,13 +33,14 @@ define(["three", "system/math", "./line", "./actionbase"], function (THREE, Math
             i -= 2;
         }
 
-        self.line.setPointAt(i , val);
+        self.line.setPoint(i , val);
     }
 
     Action.prototype.commit = function(config) {
         var self = this.self;
 
         config.index = self.index + 1;
+        config.edit = self.edit;
 
         self.deferred.resolve(config);
     }
@@ -54,12 +55,18 @@ define(["three", "system/math", "./line", "./actionbase"], function (THREE, Math
         }
         // config.edit? == true
 
+        self.edit = config.edit;
         self.target = config.target;
         self.index = config.index;
 
-        var a = self.target.getPointAt( self.index );
+        if(self.edit) {
+            var a = self.target.getPoint( self.index - 1 );
+        }
+        else {
+            var a = self.target.getPoint( self.index );
+        }
         var b = config.point;
-        var c = self.target.getPointAt( self.index + 1 );
+        var c = self.target.getPoint( self.index + 1 );
 
         var mesh = [
         ];
