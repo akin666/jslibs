@@ -9,6 +9,8 @@ define(
         './system/math',
         './system/time',
         './system/array2d',
+        './system/serialize',
+        './system/settings',
     ] ,
     function (
         Instance,
@@ -16,7 +18,9 @@ define(
         Log,
         Math,
         Time,
-        Array2D
+        Array2D,
+        Serialize,
+        Settings
     ) {
         return {
             Instance: Instance,
@@ -25,5 +29,7 @@ define(
             Math: Math,
             Time: Time,
             Array2D: Array2D,
+            Serialize: Serialize,
+            Settings: Settings
         }
     });

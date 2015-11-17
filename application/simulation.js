@@ -1,53 +1,56 @@
 /**
  * Created by akin on 31/08/15.
  */
-define(["system"], function (System) {
-    function Application(config){
-        this.element = config.element;
+"use strict";
+define([
+    "system"],
+    function (
+        System) {
+        class Application {
+            constructor(config) {
+                this.element = config.element;
 
-        this.time = new System.Time();
-        this.updateID = null;
+                this.time = new System.Time();
+                this.updateID = null;
 
-        this.maxSimulationTime = 1000;
+                this.maxSimulationTime = 1000;
+            }
 
-        return this;
-    }
+            logicUpdate(config) {
+            }
 
-    Application.prototype.logicUpdate = function(config){
-    }
+            drawUpdate(config) {
+            }
 
-    Application.prototype.drawUpdate = function(config){
-    }
+            skippedUpdate(config) {
+                console.log("Skipped " + config.delta + " seconds.");
+            }
 
-    Application.prototype.skippedUpdate = function(config){
-        console.log("Skipped " + config.delta + " seconds.");
-    }
+            update() {
+                this.updateID = requestAnimationFrame(this.update.bind(this));
+                this.time.apply();
 
-    Application.prototype.update = function() {
-        this.updateID = requestAnimationFrame( this.update.bind(this) );
-        this.time.apply();
+                var delta = this.time.getDelta();
+                if (delta > this.maxSimulationTime) {
+                    this.skippedUpdate({
+                        delta: delta * 0.001,
+                        ms: delta
+                    });
+                    delta = 0.0;
+                }
 
-        var delta = this.time.getDelta();
-        if( delta > this.maxSimulationTime ) {
-            this.skippedUpdate({
-                delta: delta * 0.001,
-                ms: delta
-            });
-            delta = 0.0;
+                this.logicUpdate({
+                    delta: delta * 0.001,
+                    ms: delta
+                });
+                this.drawUpdate({});
+            }
+
+            exit() {
+                cancelAnimationFrame(this.updateID);
+                this.updateID = null;
+            }
         }
 
-        this.logicUpdate({
-            delta: delta * 0.001,
-            ms: delta
-        });
-        this.drawUpdate({
-        });
-    }
-
-    Application.prototype.exit = function() {
-        cancelAnimationFrame(this.updateID);
-        this.updateID = null;
-    }
-
-    return Application;
-});
+        return Application;
+    });

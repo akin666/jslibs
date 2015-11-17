@@ -3,24 +3,26 @@
  */
 "use strict";
 define([
-        "three",
-        "system",
-        "system/settings",
-        "scene",
-        "./simulation",
-        "input"],
+    "three",
+    "system",
+    "system/settings",
+    "scene",
+    "./simulation",
+    "guilt"],
     function (
         THREE,
         System,
         Settings,
         Scene,
         Simulation,
-        Input) {
+        Guilt) {
         class Application extends Simulation {
             constructor(config) {
                 super(config);
 
                 this.settings = new Settings();
+
+                var rec = new Guilt.Rectangle();
 
                 // ThreeJS test app
                 this.width = this.element.width();
@@ -87,8 +89,6 @@ define([
 
                 // start simulation right away...
                 this.update();
-
-                return this;
             }
 
             logicUpdate(config) {

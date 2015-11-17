@@ -1,21 +1,22 @@
 /**
  * Created by akin on 30.8.2015.
  */
-define(['./instance'] , function (Instance) {
-    function Music( file ){
-        // Call super
-        Instance.call( this );
-        this._file = file;
+"use strict";
+define([
+    './instance'] ,
+    function (Instance) {
+        var fileVar = Symbol();
+        class Music extends Instance {
+            constructor( file ){
+                // Call super
+                super();
 
-        return this;
-    }
+                this[fileVar] = file;
+            }
 
-    // class extends the base class.
-    Music.prototype = Object.create( Instance.prototype );
-
-    Music.prototype.getFile = function(){
-        return( this._file );
-    }
-
-    return Music;
-});
+            get file(){
+                return this[fileVar];
+            }
+        }
+        return Music;
+    });

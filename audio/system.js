@@ -1,49 +1,50 @@
 /**
  * Created by akin on 30.8.2015.
  */
-define(function () {
-    function System(){
-        this.JUKEBOX = "jukebox";
-        this.INSTANCE = "instance";
-        this.SOURCE = "instance";
-        this.PLAYER = "instance";
+"use strict";
+define(
+    function () {
+        class System {
+            constructor() {
+                this.JUKEBOX = "jukebox";
+                this.INSTANCE = "instance";
+                this.SOURCE = "instance";
+                this.PLAYER = "instance";
+            }
 
-        return this;
-    }
+            // create audio objects
+            create(config) {
+                // type: jukebox, instance
+                // layer: string
+            }
 
-    // create audio objects
-    System.prototype.create = function(config){
-        // type: jukebox, instance
-        // layer: string
-    }
+            // release resource
+            release(config) {
+            }
 
-    // release resource
-    System.prototype.release = function(config){
-    }
+            // get information about the current state
+            info(config) {
+            }
 
-    // get information about the current state
-    System.prototype.info = function(config){
-    }
+            // set system
+            set(config) {
+            }
 
-    // set system
-    System.prototype.set = function(config){
-    }
+            // set volumes
+            volume(config) {
+            }
 
-    // set volumes
-    System.prototype.volume = function(config){
-    }
+            // pause playback
+            pause(config) {
+            }
 
-    // pause playback
-    System.prototype.pause = function(config){
-    }
+            // play/resume playback
+            play(config) {
+            }
 
-    // play/resume playback
-    System.prototype.play = function(config){
-    }
-
-    // stop playback
-    System.prototype.stop = function(config){
-    }
-
+            // stop playback
+            stop(config) {
+            }
+        }
     return System;
-});
+    });

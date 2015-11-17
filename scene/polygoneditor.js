@@ -4,15 +4,18 @@
 
 define([
     "three",
-    "../system/math",
+    "system/math",
+    "system/settings",
     "input",
     "./polygon",
     "./point",
     "./actionpoint",
-    "./actionline"
+    "./actionline",
+
 ], function (
     THREE,
     Math,
+    Settings,
     Input,
     Polygon,
     Point,
@@ -37,6 +40,8 @@ define([
         self.polygon = config.polygon;
         self.element = config.element;
 
+        self.settings = config.settings;
+
         self.width = self.element.width();
         self.height = self.element.height();
 
@@ -53,14 +58,20 @@ define([
             target: this
         });
 
-        self.point.init({
-            parent: self.polygon.object(),
-            mesh: self.polygon.mesh(),
-            material: new THREE.PointsMaterial( {
+        var key = "PolygonEditorPointMaterial";
+        var material = self.settings.get(
+            key,
+            new THREE.PointsMaterial( {
                 color: 0xFF99FF,
                 size: 10.0,
                 sizeAttenuation: false
             })
+        );
+
+        self.point.init({
+            parent: self.polygon.object(),
+            mesh: self.polygon.mesh(),
+            material: material
         });
     }
 
@@ -152,7 +163,10 @@ define([
                         }
 
                         config.edit = false;
-                        var index = Math.findClosestPoint( config.point , self.polygon.mesh() );
+                        var index = Math.findClosestPoint(
+                            config.point ,
+                            self.polygon.mesh()
+                        );
 
                         // is the click close enough?
                         var p1 = self.polygon.getPoint( index );

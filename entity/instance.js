@@ -1,17 +1,21 @@
 /**
  * Created by akin on 30.8.2015.
  */
-define(function () {
-    var instanceID = 1;
+"use strict";
+define(
+    function () {
+        var instanceID = 1;
+        var idVar = Symbol();
 
-    function Instance(){
-        this._ID = ++instanceID;
-        return this ;
-    }
+        class Instance {
+            constructor() {
+                this[idVar] = ++instanceID;
+            }
 
-    Instance.prototype.getID = function() {
-        return this._ID;
-    }
+            get id() {
+                return this[idVar];
+            }
+        }
 
-    return Instance;
-});
+        return Instance;
+    });
