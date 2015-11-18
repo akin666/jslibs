@@ -1,75 +1,87 @@
 /**
  * Created by akin on 1.9.2015.
  */
-define(["./serialize"], function (Serialize)  {
-    function Settings(config){
-        this.self = {
-            data: {},
-            serializer: new Serialize()
-        };
-        return this;
-    }
+"use strict";
+define([
+    "./serialize"],
+    function (
+        Serialize)  {
+        var dataVar = Symbol();
+        var serializerVar = Symbol();
+        class Settings {
+            constructor(config) {
+                this[dataVar] = null;
+                this[serializerVar] = new Serialize();
+            }
 
-    Settings.prototype.import = function(config) {
-        var self = this.self;
-    }
+            set data(val) {
+                this[dataVar] = val;
+            }
 
-    Settings.prototype.export = function() {
-        var self = this.self;
-    }
+            get data() {
+                return this[dataVar];
+            }
 
-    Settings.prototype.get = function (key , expectedDefaultValue) {
-        var self = this.self;
+            set serializer(val) {
+                this[serializerVar] = val;
+            }
 
-        var current = self.data[key];
-        if(current == null) {
-            return expectedDefaultValue;
+            get serializer() {
+                return this[serializerVar];
+            }
+
+            import(config) {
+            }
+
+            export() {
+            }
+
+            get(key, expectedDefaultValue) {
+                var current = this.data[key];
+                if (current == null) {
+                    return expectedDefaultValue;
+                }
+
+                // unserialize etc.
+                if (current.serialized) {
+                    return this.serializer.unserialize(current.value);
+                }
+                return current.value;
+            }
+
+            set(key, value) {
+                if (key == null) {
+                    return value;
+                }
+
+                // The data is in complex class, lets try to transform it into POD class.
+                var result = {
+                    value: value,
+                    serialized: false
+                };
+                var data = this.serializer.serialize(value);
+                if (data != null) {
+                    result.value = data;
+                    result.serialized = true;
+                }
+
+                this.data[key] = result;
+
+                return value;
+            }
+
+            clear(key) {
+                // clear all?
+                if (key == null) {
+                    this.data = {};
+                    return value;
+                }
+
+                // delete self.data[key] ?does this work?.. TODO
+                this.data[key] = undefined;
+
+                return value;
+            }
         }
-
-        // unserialize etc.
-        if( current.serialized ) {
-            return self.serializer.unserialize(current.value);
-        }
-        return current.value;
-    }
-
-    Settings.prototype.set = function (key , value) {
-        var self = this.self;
-
-        if( key == null ) {
-            return value;
-        }
-
-        // The data is in complex class, lets try to transform it into POD class.
-        var result = {
-            value: value,
-            serialized: false
-        };
-        var data = self.serializer.serialize(value);
-        if( data != null ) {
-            result.value = data;
-            result.serialized = true;
-        }
-
-        self.data[key] = result;
-
-        return value;
-    }
-
-    Settings.prototype.clear = function (key) {
-        var self = this.self;
-
-        // clear all?
-        if( key == null ) {
-            self.data = {};
-            return value;
-        }
-
-        // delete self.data[key] ?does this work?.. TODO
-        self.data[key] = undefined;
-
-        return value;
-    }
-
-    return Settings;
-});
+        return Settings;
+    });

@@ -1,18 +1,19 @@
 /**
  * Created by akin on 1.9.2015.
  */
-define(function () {
-    function Serialize(config){
-        return this;
-    }
+define(
+    function () {
+        class Serialize {
+            constructor(config) {
+            }
 
-    Serialize.prototype.serialize = function(config) {
-        return null;
-    }
+            serialize(config) {
+                return null;
+            }
 
-    Serialize.prototype.unserialize = function(config) {
-        return null;
-    }
-
-    return Serialize;
-});
+            unserialize(config) {
+                return null;
+            }
+        }
+        return Serialize;
+    });

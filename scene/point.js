@@ -1,33 +1,36 @@
 /**
  * Created by akin on 22/09/15.
  */
+"use strict";
+define([
+        "three",
+        "../system/math",
+        "./base"],
+    function (
+        THREE,
+        Math,
+        Base) {
+        class Point extends Base {
+            constructor(config) {
+                super(config);
+            }
 
-define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
-    function Point(config){
-        Base.call( this , config );
-        return this;
-    }
+            apply() {
+                this.destroyGraphics();
 
-    // specify inheritance
-    Point.prototype = Object.create( Base.prototype );
+                var geom = new THREE.Geometry();
+                for (var i = 0; i < this.mesh.length; ++i) {
+                    geom.vertices.push(this.mesh[i]);
+                }
+                var object = new THREE.Points(geom, this.material);
 
-    Point.prototype.apply = function() {
-        this.destroyGraphics();
-        var self = this.self;
+                if (object == null) {
+                    return;
+                }
 
-        var geom = new THREE.Geometry();
-        for (var i = 0; i < self.mesh.length; ++i) {
-            geom.vertices.push(self.mesh[i]);
+                this.graphics = object;
+                this.object.add(this.graphics);
+            }
         }
-        var object = new THREE.Points( geom, self.material ) ;
-
-        if(object == null) {
-            return;
-        }
-
-        self.graphics = object;
-        self.object.add(self.graphics);
-    }
-
-    return Point;
-});
+        return Point;
+    });

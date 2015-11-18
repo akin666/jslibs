@@ -1,20 +1,31 @@
 /**
  * Created by akin on 22/09/15.
  */
-define(["jquery"], function ($) {
-    function ActionBase(config){
-        this.self = {
-            target: null,
-            deferred: $.Deferred()
-        };
-        this.init(config);
-        return this;
-    }
+"use strict";
+define([
+    "jquery"],
+    function (
+        $) {
+        var deferVar = Symbol();
+        var targetVar = Symbol();
+        class Action {
+            constructor(config) {
+                this[deferVar] = $.Deferred();
+                this[targetVar] = null;
+                this.init(config);
+            }
 
-    ActionBase.prototype.promise = function() {
-        var self = this.self;
-        return self.deferred.promise();
-    }
+            get promise() {
+                return this[deferVar].promise();
+            }
 
-    return ActionBase;
-});
+            get deferred() {
+                return this[deferVar];
+            }
+
+            get target() {
+                return this[targetVar];
+            }
+        }
+        return Action;
+    });

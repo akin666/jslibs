@@ -1,7 +1,7 @@
 /**
  * Created by akin on 22/09/15.
  */
-
+"use strict";
 define([
     "three",
     "system/math",
@@ -10,210 +10,267 @@ define([
     "./polygon",
     "./point",
     "./actionpoint",
-    "./actionline",
+    "./actionline"],
+    function (
+        THREE,
+        Math,
+        Settings,
+        Input,
+        Polygon,
+        Point,
+        ActionPoint,
+        ActionLine) {
+        var actionVar = Symbol();
+        var polygonVar = Symbol();
+        var pointVar = Symbol();
+        var elementVar = Symbol();
+        var settingsVar = Symbol();
+        var widthVar = Symbol();
+        var heightVar = Symbol();
+        class Editor {
+            constructor(config) {
+                this[actionVar] = null;
+                this[polygonVar] = null;
+                this[pointVar] = new Point();
+                this[elementVar] = null;
+                this[settingsVar] = null;
+                this[widthVar] = null;
+                this[heightVar] = null;
 
-], function (
-    THREE,
-    Math,
-    Settings,
-    Input,
-    Polygon,
-    Point,
-    ActionPoint,
-    ActionLine
-) {
-    function Editor(config){
-        this.self = {};
-        var self = this.self;
-
-        self.action = null;
-        self.polygon = null;
-        self.point = new Point();
-
-        this.init(config);
-        return this;
-    }
-
-    Editor.prototype.init = function(config) {
-        var self = this.self;
-
-        self.polygon = config.polygon;
-        self.element = config.element;
-
-        self.settings = config.settings;
-
-        self.width = self.element.width();
-        self.height = self.element.height();
-
-        this.mouseInput = new Input.Mouse({
-            element: self.element,
-            target: this
-        });
-        this.touchInput = new Input.Touch({
-            element: self.element,
-            target: this
-        });
-        this.keyInput = new Input.Keyboard({
-            element: self.element,
-            target: this
-        });
-
-        var key = "PolygonEditorPointMaterial";
-        var material = self.settings.get(
-            key,
-            new THREE.PointsMaterial( {
-                color: 0xFF99FF,
-                size: 10.0,
-                sizeAttenuation: false
-            })
-        );
-
-        self.point.init({
-            parent: self.polygon.object(),
-            mesh: self.polygon.mesh(),
-            material: material
-        });
-    }
-
-    Editor.prototype.screenToScene = function(point)
-    {
-        var self = this.self;
-        return new THREE.Vector3(
-            point.x - (self.width / 2.0),
-            -point.y + (self.height / 2.0),
-            0.0 );
-    }
-
-    Editor.prototype.pointerClick = function(config) {
-        this.keyInput.bind();
-
-        var point = this.screenToScene(config);
-    }
-
-    Editor.prototype.pointerButton = function(config) {
-        var button = config.button;
-        if( button == 0 ) {
-            return;
-        }
-        var point = this.screenToScene(config);
-        var point3 = new THREE.Vector3(
-            point.x,
-            point.y,
-            0.0 );
-
-        var self = this.self;
-        if( config.down ) {
-            if( self.action != null ) {
-                self.action.commit({
-                    target: self.polygon,
-                    point: point3
-                });
+                this.init(config);
             }
-        }
-        else {
-            // "commit"
-            if( self.action != null ){
-                self.action.commit({
-                    target: self.polygon,
-                    point: point3
-                });
+
+            get action() {
+                return this[actionVar];
             }
-        }
-    }
 
-    Editor.prototype.pointerAction = function(config) {
-        if (config.type == "end") {
-            this.keyInput.unbind();
-        }
-        else if (config.type == "cancel") {
-            this.keyInput.unbind();
-        }
-        else if( config.type == "continue" ) {
-            this.keyInput.bind();
-        }
-    }
+            set action(val) {
+                this[actionVar] = val;
+            }
 
-    Editor.prototype.pointerMove = function(config) {
-        var point = this.screenToScene(config);
-        var point3 = new THREE.Vector3(
-            point.x,
-            point.y,
-            0.0 );
-        var self = this.self;
+            get polygon() {
+                return this[polygonVar];
+            }
 
-        if (config.button == null || config.button.length > 0) {
-        }
-        else {
-            if( self.action == null ) {
+            set polygon(val) {
+                this[polygonVar] = val;
+            }
+
+            get point() {
+                return this[pointVar];
+            }
+
+            set point(val) {
+                this[pointVar] = val;
+            }
+
+            get element() {
+                return this[elementVar];
+            }
+
+            set element(val) {
+                this[elementVar] = val;
+            }
+
+            get width() {
+                return this[widthVar];
+            }
+
+            set width(val) {
+                this[widthVar] = val;
+            }
+
+            get height() {
+                return this[heightVar];
+            }
+
+            set height(val) {
+                this[heightVar] = val;
+            }
+
+            get settings() {
+                return this[settingsVar];
+            }
+
+            set settings(val) {
+                this[settingsVar] = val;
+            }
+
+            init(config) {
                 var self = this.self;
-                // Yes, this, clusterfuck does it all.
-                var action = new ActionLine({
-                    target: self.polygon,
-                    point: point3
+
+                this.polygon = config.polygon;
+                this.element = config.element;
+
+                this.settings = config.settings;
+
+                this.width = this.element.width();
+                this.height = this.element.height();
+
+                this.mouseInput = new Input.Mouse({
+                    element: this.element,
+                    target: this
                 });
-                self.action = action;
+                this.touchInput = new Input.Touch({
+                    element: this.element,
+                    target: this
+                });
+                this.keyInput = new Input.Keyboard({
+                    element: this.element,
+                    target: this
+                });
 
-                action.promise().then(
-                    function(config) {
-                        // Success
-                        // Clean previous action..
-                        if( self.action != null ) {
-                            self.action.destroy();
-                            self.action = null;
-                        }
+                var key = "PolygonEditorPointMaterial";
+                var material = this.settings.get(
+                    key,
+                    new THREE.PointsMaterial({
+                        color: 0xFF99FF,
+                        size: 10.0,
+                        sizeAttenuation: false
+                    })
+                );
 
-                        config.edit = false;
-                        var index = Math.findClosestPoint(
-                            config.point ,
-                            self.polygon.mesh()
-                        );
+                this.point.init({
+                    parent: this.polygon.object(),
+                    mesh: this.polygon.mesh(),
+                    material: material
+                });
+            }
 
-                        // is the click close enough?
-                        var p1 = self.polygon.getPoint( index );
-                        var distance = config.point.distanceTo( p1 );
+            screenToScene(point) {
+                return new THREE.Vector3(
+                    point.x - (this.width / 2.0),
+                    -point.y + (this.height / 2.0),
+                    0.0);
+            }
 
-                        if( distance <= 20 ) {
-                            config.edit = true;
-                            config.index = index;
-                        }
+            pointerClick(config) {
+                this.keyInput.bind();
+                var point = this.screenToScene(config);
+            }
 
-                        var pointAction = new ActionPoint(config);
-                        self.action = pointAction;
+            pointerButton(config) {
+                var button = config.button;
+                if (button == 0) {
+                    return;
+                }
+                var point = this.screenToScene(config);
+                var point3 = new THREE.Vector3(
+                    point.x,
+                    point.y,
+                    0.0);
 
-                        pointAction.promise().then(function(config) {
+                if (config.down) {
+                    if (this.action != null) {
+                        this.action.commit({
+                            target: this.polygon,
+                            point: point3
+                        });
+                    }
+                }
+                else {
+                    // "commit"
+                    if (this.action != null) {
+                        this.action.commit({
+                            target: this.polygon,
+                            point: point3
+                        });
+                    }
+                }
+            }
+
+            pointerAction(config) {
+                if (config.type == "end") {
+                    this.keyInput.unbind();
+                }
+                else if (config.type == "cancel") {
+                    this.keyInput.unbind();
+                }
+                else if (config.type == "continue") {
+                    this.keyInput.bind();
+                }
+            }
+
+            pointerMove(config) {
+                var point = this.screenToScene(config);
+                var point3 = new THREE.Vector3(
+                    point.x,
+                    point.y,
+                    0.0);
+
+                if (config.button == null || config.button.length > 0) {
+                }
+                else {
+                    if (this.action == null) {
+                        var self = this;
+                        // Yes, this, clusterfuck does it all.
+                        var action = new ActionLine({
+                            target: self.polygon,
+                            point: point3
+                        });
+                        self.action = action;
+
+                        action.promise().then(
+                            function (config) {
                                 // Success
                                 // Clean previous action..
-                                if( self.action != null ) {
+                                if (self.action != null) {
                                     self.action.destroy();
                                     self.action = null;
                                 }
 
-                                if( config.edit ) {
-                                    self.polygon.setPoint(config.index - 1, config.point);
-                                    self.point.setPoint(config.index - 1, config.point);
+                                config.edit = false;
+                                var index = Math.findClosestPoint(
+                                    config.point,
+                                    self.polygon.mesh()
+                                );
+
+                                // is the click close enough?
+                                var p1 = self.polygon.getPoint(index);
+                                var distance = config.point.distanceTo(p1);
+
+                                if (distance <= 20) {
+                                    config.edit = true;
+                                    config.index = index;
                                 }
-                                else {
-                                    self.polygon.addPoint(config.index, config.point);
-                                    self.point.addPoint(config.index, config.point);
-                                }
-                            },
-                            function(config) {
+
+                                var pointAction = new ActionPoint(config);
+                                self.action = pointAction;
+
+                                pointAction.promise().then(function (config) {
+                                        // Success
+                                        // Clean previous action..
+                                        if (self.action != null) {
+                                            self.action.destroy();
+                                            self.action = null;
+                                        }
+
+                                        if (config.edit) {
+                                            self.polygon.setPoint(config.index - 1, config.point);
+                                            self.point.setPoint(config.index - 1, config.point);
+                                        }
+                                        else {
+                                            self.polygon.addPoint(config.index, config.point);
+                                            self.point.addPoint(config.index, config.point);
+                                        }
+                                    },
+                                    function (config) {
+                                        // Fail
+                                    });
+                            }, function (config) {
                                 // Fail
                             });
-                    }, function(config){
-                        // Fail
-                    });
+                    }
+                }
+
+                if (this.action != null) {
+                    this.action.move(point3);
+                }
+            }
+
+            keyPress(config) {
+                console.log("ThreeApp: key: " + config.key + " code: " + config.code);
             }
         }
-
-        if( self.action != null ){
-            self.action.move(point3);
-        }
-    }
-
-    Editor.prototype.keyPress = function(config) {
-        console.log("ThreeApp: key: " + config.key + " code: " + config.code);
-    }
-
-    return Editor;
-});
+        return Editor;
+    });

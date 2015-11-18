@@ -1,51 +1,87 @@
 /**
  * Created by akin on 1.9.2015.
  */
-define(function () {
-    function Array2D(config){
-        this.resetValue = 0;
-        this.init(config);
-        return this;
-    }
+"use strict";
+define(
+    function () {
+        var resetVar = Symbol();
+        var sizeVar = Symbol();
+        class Array2D {
+            constructor(config) {
+                this[resetVar] = 0;
+                this[sizeVar] = {
+                    width: 0,
+                    height: 0
+                }
+                this.data = null;
+                this.init(config);
+            }
 
-    Array2D.prototype.init = function(config) {
-        this.width = parseInt(config.width);
-        this.height = parseInt(config.height);
-        if( config.resetValue != null ) {
-            this.resetValue = config.resetValue;
+            init(config) {
+                this[sizeVar] = {
+                    width: parseInt(config.width),
+                    height: parseInt(config.height)
+                }
+
+                if (config.resetValue != null) {
+                    this.resetValue = config.resetValue;
+                }
+
+                this.data = new Array(
+                    this.width * this.height
+                );
+                this.reset();
+            }
+
+            get resetValue() {
+                return this[resetVar];
+            }
+
+            set resetValue(val) {
+                this[resetVar] = val;
+            }
+
+            get width() {
+                return this[sizeVar].width;
+            }
+
+            set width(val) {
+                this[sizeVar].width = val;
+            }
+
+            get height() {
+                return this[sizeVar].height;
+            }
+
+            set height(val) {
+                this[sizeVar].height = val;
+            }
+
+            reset() {
+                for (var i = 0; i < this.data.length; ++i) {
+                    this.data[i] = this.resetValue;
+                }
+            }
+
+            raw() {
+                return this.data;
+            }
+
+            cell(x, y, val) {
+                if (x == null || y == null) {
+                    return this.resetValue;
+                }
+                while (x < 0) x += this.width;
+                while (x >= this.width) x -= this.width;
+                while (y < 0) y += this.height;
+                while (y >= this.height) y -= this.height;
+
+                if (val != null) {
+                    this.data[y * this.width + x] = val;
+                    return val;
+                }
+                return this.data[y * this.width + x];
+            }
         }
-
-        this.data = new Array(
-            this.width * this.height
-        );
-        this.reset();
-    }
-
-    Array2D.prototype.reset = function() {
-        for( var i = 0 ; i < this.data.length ; ++i ) {
-            this.data[i] = this.resetValue;
-        }
-    }
-
-    Array2D.prototype.raw = function() {
-        return this.data;
-    }
-
-    Array2D.prototype.cell = function(x , y , val) {
-        if( x == null || y == null ) {
-            return this.resetValue;
-        }
-        while( x < 0 ) x += this.width;
-        while( x >= this.width ) x -= this.width;
-        while( y < 0 ) y += this.height;
-        while( y >= this.height ) y -= this.height;
-
-        if( val != null ) {
-            this.data[y * this.width + x] = val;
-            return val;
-        }
-        return this.data[y * this.width + x];
-    }
-
-    return Array2D;
-});
+        return Array2D;
+    });

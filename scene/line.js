@@ -1,33 +1,36 @@
 /**
  * Created by akin on 22/09/15.
  */
-define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
-    function Line(config){
-        Base.call( this , config );
+"use strict";
+define([
+    "three",
+    "../system/math",
+    "./base"],
+    function (
+        THREE,
+        Math,
+        Base) {
+        class Line extends Base {
+            constructor(config) {
+                super(config);
+            }
 
-        return this;
-    }
+            apply() {
+                this.destroyGraphics();
 
-    // specify inheritance
-    Line.prototype = Object.create( Base.prototype );
+                var geom = new THREE.Geometry();
+                for (var i = 0; i < this.mesh.length; ++i) {
+                    geom.vertices.push(this.mesh[i]);
+                }
+                var object = new THREE.Line(geom, this.material);
 
-    Line.prototype.apply = function() {
-        this.destroyGraphics();
-        var self = this.self;
+                if (object == null) {
+                    return;
+                }
 
-        var geom = new THREE.Geometry();
-        for (var i = 0; i < self.mesh.length; ++i) {
-            geom.vertices.push(self.mesh[i]);
+                this.graphics = object;
+                this.object.add(this.graphics);
+            }
         }
-        var object = new THREE.Line( geom, self.material ) ;
-
-        if(object == null) {
-            return;
-        }
-
-        self.graphics = object;
-        self.object.add(self.graphics);
-    }
-
-    return Line;
-});
+        return Line;
+    });

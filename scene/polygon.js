@@ -1,34 +1,37 @@
 /**
  * Created by akin on 22/09/15.
  */
+"use strict";
+define([
+        "three",
+        "../system/math",
+        "./base"],
+    function (
+        THREE,
+        Math,
+        Base) {
+        class Polygon extends Base {
+            constructor(config) {
+                super(config);
+            }
 
-define(["three", "../system/math", "./base"], function (THREE, Math, Base) {
-    function Polygon(config){
-        Base.call( this , config );
-        return this;
-    }
+            apply() {
+                this.destroyGraphics();
 
-    // specify inheritance
-    Polygon.prototype = Object.create( Base.prototype );
+                var geom = new THREE.Geometry();
+                for (var i = 0; i < this.mesh.length; ++i) {
+                    geom.vertices.push(this.mesh[i]);
+                }
+                geom.vertices.push(this.mesh[0]);
+                var object = new THREE.Line(geom, this.material);
 
-    Polygon.prototype.apply = function() {
-        this.destroyGraphics();
-        var self = this.self;
+                if (object == null) {
+                    return;
+                }
 
-        var geom = new THREE.Geometry();
-        for (var i = 0; i < self.mesh.length; ++i) {
-            geom.vertices.push(self.mesh[i]);
+                this.graphics = object;
+                this.object.add(this.graphics);
+            }
         }
-        geom.vertices.push(self.mesh[0]);
-        var object = new THREE.Line( geom, self.material ) ;
-
-        if(object == null) {
-            return;
-        }
-
-        self.graphics = object;
-        self.object.add(self.graphics);
-    }
-
-    return Polygon;
-});
+        return Polygon;
+    });

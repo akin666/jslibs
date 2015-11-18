@@ -1,21 +1,28 @@
 /**
  * Created by akin on 22/09/15.
  */
-define(["jquery","three"], function ($,THREE) {
-    function Camera(config){
-        this.self = {
-            target: null,
-            deferred: $.Deferred()
-        };
-        this.init(config);
-        return this;
-    }
+"use strict";
+define([
+    "jquery",
+    "three"],
+    function (
+        $,
+        THREE) {
+        var deferVar = Symbol();
+        var targetVar = Symbol();
+        class Camera {
+            constructor(config) {
+                this[deferVar] = $.Deferred();
+                this[targetVar] = null;
 
-    // On ViewTarget resize, emit event.
-    Camera.prototype.construct = function() {
-        var self = this.self;
-        return self.deferred.promise();
-    }
+                this.init(config);
+            }
 
-    return Camera;
-});
+            // On ViewTarget resize, emit event.
+            construct() {
+                var self = this.self;
+                return self.deferred.promise();
+            }
+        }
+        return Camera;
+    });
