@@ -5,13 +5,11 @@ define(
     [
         './input/keyboard',
         './input/mouse',
-        './input/touch',
-    ] ,
+        './input/touch'],
     function (
         Keyboard,
         Mouse,
-        Touch
-    ) {
+        Touch ) {
         return {
             Keyboard: Keyboard,
             Mouse: Mouse,

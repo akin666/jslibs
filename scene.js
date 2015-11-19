@@ -6,14 +6,12 @@ define(
         './scene/polygon',
         './scene/line',
         './scene/point',
-        './scene/polygoneditor',
-    ] ,
+        './scene/polygoneditor'],
     function (
         Polygon,
         Line,
         Point,
-        PolygonEditor
-    ) {
+        PolygonEditor ) {
         return {
             Polygon: Polygon,
             Line: Line,

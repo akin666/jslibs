@@ -1,6 +1,7 @@
 /**
  * Created by akin on 1.9.2015.
  */
+"use strict";
 define(
     function () {
         class Serialize {

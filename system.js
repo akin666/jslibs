@@ -10,8 +10,7 @@ define(
         './system/time',
         './system/array2d',
         './system/serialize',
-        './system/settings',
-    ] ,
+        './system/settings'],
     function (
         Instance,
         Music,
@@ -20,8 +19,7 @@ define(
         Time,
         Array2D,
         Serialize,
-        Settings
-    ) {
+        Settings ) {
         return {
             Instance: Instance,
             Music: Music,

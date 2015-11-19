@@ -5,13 +5,11 @@ define(
     [
         './audio/instance',
         './audio/system',
-        './audio/jukebox',
-    ] ,
+        './audio/jukebox'],
     function (
         Instance,
         System,
-        Jukebox
-    ) {
+        Jukebox) {
         return {
             Instance: Instance,
             System: System,

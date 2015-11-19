@@ -4,11 +4,9 @@
 "use strict";
 define(
     [
-        './guilt/rectangle',
-    ] ,
+        './guilt/rectangle'],
     function (
-        Rectangle
-    ) {
+        Rectangle ) {
         return {
             Rectangle: Rectangle
         }

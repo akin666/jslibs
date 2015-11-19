@@ -10,7 +10,7 @@ define([
         var serializerVar = Symbol();
         class Settings {
             constructor(config) {
-                this[dataVar] = null;
+                this[dataVar] = {};
                 this[serializerVar] = new Serialize();
             }
 
