@@ -44,7 +44,7 @@ define([
 
             getClosestIndex(point) {
                 // 3d.. get .. maybe reduce to 2D ..
-                return Math.findClosestLine(point, this.target.mesh());
+                return Math.findClosestLine(point, this.target.mesh);
             }
 
             commit(config) {
@@ -73,7 +73,7 @@ define([
                 }
 
                 var lconfig = {
-                    parent: this.target.object(),
+                    parent: this.target.object,
                     mesh: mesh,
                     material: new THREE.LineBasicMaterial({
                         color: 0xFF00FF,

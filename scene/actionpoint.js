@@ -94,7 +94,7 @@ define([
                 }
 
                 var lconfig = {
-                    parent: this.target.object(),
+                    parent: this.target.object,
                     attach: true,
                     mesh: mesh,
                     material: new THREE.LineBasicMaterial({

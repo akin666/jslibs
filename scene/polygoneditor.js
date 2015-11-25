@@ -27,6 +27,7 @@ define([
         var settingsVar = Symbol();
         var widthVar = Symbol();
         var heightVar = Symbol();
+        var inputVar = Symbol();
         class Editor {
             constructor(config) {
                 this[actionVar] = null;
@@ -36,6 +37,7 @@ define([
                 this[settingsVar] = null;
                 this[widthVar] = null;
                 this[heightVar] = null;
+                this[inputVar] = null;
 
                 this.init(config);
             }
@@ -96,9 +98,15 @@ define([
                 this[settingsVar] = val;
             }
 
-            init(config) {
-                var self = this.self;
+            get input() {
+                return this[inputVar];
+            }
 
+            set input(val) {
+                this[inputVar] = val;
+            }
+
+            init(config) {
                 this.polygon = config.polygon;
                 this.element = config.element;
 
@@ -107,15 +115,17 @@ define([
                 this.width = this.element.width();
                 this.height = this.element.height();
 
-                this.mouseInput = new Input.Mouse({
+                this[inputVar] = {};
+
+                this[inputVar].mouseInput = new Input.Mouse({
                     element: this.element,
                     target: this
                 });
-                this.touchInput = new Input.Touch({
+                this[inputVar].touchInput = new Input.Touch({
                     element: this.element,
                     target: this
                 });
-                this.keyInput = new Input.Keyboard({
+                this[inputVar].keyInput = new Input.Keyboard({
                     element: this.element,
                     target: this
                 });
@@ -131,8 +141,8 @@ define([
                 );
 
                 this.point.init({
-                    parent: this.polygon.object(),
-                    mesh: this.polygon.mesh(),
+                    parent: this.polygon.object,
+                    mesh: this.polygon.mesh,
                     material: material
                 });
             }
@@ -145,7 +155,7 @@ define([
             }
 
             pointerClick(config) {
-                this.keyInput.bind();
+                this.input.keyInput.bind();
                 var point = this.screenToScene(config);
             }
 
@@ -181,13 +191,13 @@ define([
 
             pointerAction(config) {
                 if (config.type == "end") {
-                    this.keyInput.unbind();
+                    this.input.keyInput.unbind();
                 }
                 else if (config.type == "cancel") {
-                    this.keyInput.unbind();
+                    this.input.keyInput.unbind();
                 }
                 else if (config.type == "continue") {
-                    this.keyInput.bind();
+                    this.input.keyInput.bind();
                 }
             }
 
@@ -202,31 +212,32 @@ define([
                 }
                 else {
                     if (this.action == null) {
-                        var self = this;
                         // Yes, this, clusterfuck does it all.
+                        // TODO, redesign.
                         var action = new ActionLine({
-                            target: self.polygon,
+                            target: this.polygon,
                             point: point3
                         });
-                        self.action = action;
+                        this.action = action;
 
-                        action.promise().then(
+                        var editor = this;
+                        action.promise.then(
                             function (config) {
                                 // Success
                                 // Clean previous action..
-                                if (self.action != null) {
-                                    self.action.destroy();
-                                    self.action = null;
+                                if (editor.action != null) {
+                                    editor.action.destroy();
+                                    editor.action = null;
                                 }
 
                                 config.edit = false;
                                 var index = Math.findClosestPoint(
                                     config.point,
-                                    self.polygon.mesh()
+                                    editor.polygon.mesh
                                 );
 
                                 // is the click close enough?
-                                var p1 = self.polygon.getPoint(index);
+                                var p1 = editor.polygon.getPoint(index);
                                 var distance = config.point.distanceTo(p1);
 
                                 if (distance <= 20) {
@@ -235,23 +246,23 @@ define([
                                 }
 
                                 var pointAction = new ActionPoint(config);
-                                self.action = pointAction;
+                                editor.action = pointAction;
 
-                                pointAction.promise().then(function (config) {
+                                pointAction.promise.then(function (config) {
                                         // Success
                                         // Clean previous action..
-                                        if (self.action != null) {
-                                            self.action.destroy();
-                                            self.action = null;
+                                        if (editor.action != null) {
+                                            editor.action.destroy();
+                                            editor.action = null;
                                         }
 
                                         if (config.edit) {
-                                            self.polygon.setPoint(config.index - 1, config.point);
-                                            self.point.setPoint(config.index - 1, config.point);
+                                            editor.polygon.setPoint(config.index - 1, config.point);
+                                            editor.point.setPoint(config.index - 1, config.point);
                                         }
                                         else {
-                                            self.polygon.addPoint(config.index, config.point);
-                                            self.point.addPoint(config.index, config.point);
+                                            editor.polygon.addPoint(config.index, config.point);
+                                            editor.point.addPoint(config.index, config.point);
                                         }
                                     },
                                     function (config) {

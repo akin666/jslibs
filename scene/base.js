@@ -46,6 +46,7 @@ define([
             }
 
             get object() {
+                writable: true;
                 return this[objectVar];
             }
 
@@ -110,6 +111,10 @@ define([
                         this.parent.remove(this.object);
                     }
                 }
+            }
+
+            detach() {
+                this.attach(false);
             }
 
             position(val) {
@@ -190,12 +195,16 @@ define([
                 }
 
                 if (config.position != null) {
-                    this.object.position = config.position;
+                    this.object.position.set(
+                        config.position.x,
+                        config.position.y,
+                        config.position.z
+                    );
                 }
 
-                this.parent = config.parent;
-                this.mesh = config.mesh;
-                this.material = config.material;
+                this[parentVar] = config.parent;
+                this[meshVar] = config.mesh;
+                this[materialVar] = config.material;
 
                 // Rectify mesh.
                 if (!(this.mesh[0] instanceof THREE.Vector3)) {

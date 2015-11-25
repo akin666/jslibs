@@ -23,13 +23,13 @@ define([
                     geom.vertices.push(this.mesh[i]);
                 }
                 geom.vertices.push(this.mesh[0]);
-                var object = new THREE.Line(geom, this.material);
+                var graphics = new THREE.Line(geom, this.material);
 
-                if (object == null) {
+                if (this.object == null) {
                     return;
                 }
 
-                this.graphics = object;
+                this.graphics = graphics;
                 this.object.add(this.graphics);
             }
         }

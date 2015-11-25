@@ -26,6 +26,10 @@ define([
             get target() {
                 return this[targetVar];
             }
+
+            set target(val) {
+                this[targetVar] = val;
+            }
         }
         return Action;
     });
