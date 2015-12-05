@@ -3,26 +3,37 @@
  */
 "use strict";
 define([
+    "jquery",
     "three",
     "system",
     "system/settings",
     "scene",
     "./simulation",
-    "guilt"],
+    "guilt/loader"],
     function (
+        $,
         THREE,
         System,
         Settings,
         Scene,
         Simulation,
-        Guilt) {
+        GuiltLoader) {
         class Application extends Simulation {
             constructor(config) {
                 super(config);
 
                 this.settings = new Settings();
 
-                var rec = new Guilt.Rectangle();
+                var element = config.element;
+                if( element != null ) {
+                    var source = element.attr('source');
+                    if( source !== undefined ) {
+                        var app = this;
+                        $.getJSON(source, function(data){
+                            app.load(data);
+                        });
+                    }
+                }
 
                 // ThreeJS test app
                 this.width = this.element.width();
@@ -56,40 +67,26 @@ define([
 
                 this.camera.position.z = 1.0;
 
-                var un = 20;
-
-                var key = "PolygonMaterial";
-                var material = this.settings.get(
-                    key,
-                    new THREE.LineBasicMaterial({
-                        color: 0xFFFFFF,
-                    })
-                );
-
-                this.polygon = new Scene.Polygon({
-                    parent: this.scene,
-                    attach: true,
-                    mesh: [
-                        new THREE.Vector3(-un, un, 0),
-                        new THREE.Vector3(un, un, 0),
-                        new THREE.Vector3(un, -un, 0),
-                        new THREE.Vector3(-un, -un, 0),
-                    ],
-                    material: material,
-                    position: new THREE.Vector3(-20, -60, 0)
-                });
-
-                this.editor = new Scene.PolygonEditor({
-                    polygon: this.polygon,
-                    settings: this.settings,
-                    element: $(this.renderer.domElement)
-                });
-
                 this.action = null;
 
                 // start simulation right away...
                 this.update();
             }
+
+            load(config) {
+                if (config == null) {
+                    return;
+                }
+                if (config["//"] !== undefined) {
+                    console.log(config["//"]);
+                }
+                if (config["items"] !== undefined) {
+                    for (var i = 0; i < config.items.length; ++i) {
+                        var item = config.items[i];
+                    }
+                }
+            }
+
 
             logicUpdate(config) {
             }
