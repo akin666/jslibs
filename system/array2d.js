@@ -84,11 +84,5 @@ define(
             }
         }
 
-        require(["yat", "./system/array2d.test"], function(yat, Test){
-            var runner = new yat.Runner();
-            runner.run(new Test(Array2D));
-            runner.print(function(val){ console.log(val); });
-        });
-
         return Array2D;
     });
